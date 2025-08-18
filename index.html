@@ -477,7 +477,7 @@ function startDrag(x,y){ if(Math.hypot(x-ball.x,y-ball.y)<=26 && canShoot()){ dr
 function moveDrag(x,y){ if(!dragging) return; dragX=x; dragY=y; calcAim(); }
 function endDrag(){ if(!dragging) return; dragging=false; const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL); const ang=Math.atan2(aimDY,aimDX);
   // club-specific range
-  const minPct = (club==='driver'?0.25:0.01); const maxPct=(club==='driver'?1.0:0.30);
+  const minPct = (club==='driver'?0.25:0.01); const maxPct=(club==='driver'?1.0:0.60);
   let pct = powerPct; if(pct<minPct) pct=minPct; if(pct>maxPct) pct=maxPct;
   const MAX_SPEED = (club==='driver'? DRIVER_MAX_SPEED : PUTTER_MAX_SPEED);
   const speed = pct * MAX_SPEED;
