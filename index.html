@@ -101,7 +101,7 @@
   </div>
 
 <script>
-// ======= Preset Courses (5 x 9 holes) =======
+// ======= Preset Courses (6 x 9 holes) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
 // Each hole: {start:{x,y}, cup:{x,y}, par, obstacles:[...]}
 const COURSES = [
@@ -165,6 +165,18 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:5, obstacles:[R(70,320,250,18,'green'),R(120,260,150,18,'sand'),R(160,210,70,16,'brown')]},
   ],
+  // 6) Chilling Cemetery — hardest course, gravestones
+  [
+    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(160,105,70,90,'grave')]},
+    {start:{x:370,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(120,300,150,18,'grave')]},
+    {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(90,280,210,18,'grave')]},
+    {start:{x:60,y:560},  cup:{x:330,y:90},  par:3, obstacles:[R(140,260,120,18,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(100,240,190,18,'grave')]},
+    {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'grave')]},
+    {start:{x:60,y:560},  cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,260,210,18,'grave')]},
+  ],
 ];
 
 // ======= Derived Course Pars =======
@@ -182,6 +194,7 @@ const defaultState = {
     {name:'Forest Path',   unlocked:false, best:null},
     {name:'Emerald Slides',unlocked:false, best:null},
     {name:'Chaos Peaks',   unlocked:false, best:null},
+    {name:'Chilling Cemetery', unlocked:true, best:null}, // auto-unlocked
   ]
 };
 let state = loadState();
@@ -415,8 +428,20 @@ function update(){
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // fairway stripes
-  for(let i=0;i<8;i++){ ctx.fillStyle = `rgba(255,255,255,${0.03*(i%2)})`; ctx.fillRect(0,i*80,canvas.width,40); }
+  // If current course is Chilling Cemetery (index 5), draw brown floor; otherwise draw fairway stripes
+  if(currentCourseIdx === 5){
+    // brown cemetery floor
+    ctx.fillStyle = '#5a3d2b';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // subtle darker stripes
+    for(let i=0;i<8;i++){
+      ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
+      ctx.fillRect(0,i*80,canvas.width,40);
+    }
+  } else {
+    // fairway stripes
+    for(let i=0;i<8;i++){ ctx.fillStyle = `rgba(255,255,255,${0.03*(i%2)})`; ctx.fillRect(0,i*80,canvas.width,40); }
+  }
 
   // render obstacles
   obstacles.forEach(o=>{
@@ -429,6 +454,18 @@ function draw(){
       const grd = ctx.createLinearGradient(o.x,o.y,o.x+o.w,o.y);
       grd.addColorStop(0,'#77e382'); grd.addColorStop(1,'#34c759');
       ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
+    }else if(o.type==='grave'){
+      // gravestone (gray)
+      const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
+      grd.addColorStop(0,'#bdbdbd'); grd.addColorStop(1,'#8a8a8a');
+      ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,8,true,false);
+      ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=2; ctx.stroke();
+      // small etched cross / mark for gravestone detail
+      ctx.fillStyle='rgba(0,0,0,0.12)';
+      const cx = o.x + o.w/2;
+      const cy = o.y + o.h/2 - 4;
+      ctx.fillRect(cx-1, cy-8, 2, 14);
+      ctx.fillRect(cx-6, cy-1, 12, 2);
     }else{
       const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
       grd.addColorStop(0,'#a77746'); grd.addColorStop(1,'#7d5a34');
