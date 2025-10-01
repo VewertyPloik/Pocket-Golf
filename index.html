@@ -36,7 +36,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.6, Halloween Update</h1>
+    <h1>Pocket Golf - v1.6.1, Halloween Update</h1>
 
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -233,6 +233,7 @@ const BALL_STORE = [
   {id:'yellow', name:'Sun Yellow',     price:90,  color:'#ffe14d'},
   {id:'purple', name:'Royal Purple',   price:120, color:'#a04dff'},
   {id:'mint',   name:'Mint Green',     price:150, color:'#7dffc4'},
+  {id:'pumpkin',name:'Pumpkin Ball',   price:75,   color:'#FF7518'},
 ];
 
 function show(el){ el.style.display='block'; }
@@ -291,9 +292,9 @@ const summaryBody = document.getElementById('summaryBody');
 
 const COIN_VALUE = 5; // each coin gives 5 coins
 const MAX_PULL = 200;
-const STOP_SPEED = 0.05;
-const DRIVER_MAX_SPEED = 5.6;
-const PUTTER_MAX_SPEED = 3.0 // 50% harder than previous 1.3
+const STOP_SPEED = 0.10;
+const DRIVER_MAX_SPEED = 7.0;
+const PUTTER_MAX_SPEED =4.0 // 50% harder than previous 1.3
 
 let currentCourseIdx=0, holeIdx=0; // 0..8
 let strokes=0, totalScore=0; // numeric relative to par
