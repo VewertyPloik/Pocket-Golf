@@ -36,7 +36,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.6.1, Halloween Update</h1>
+    <h1>Pocket Golf - v1.7</h1>
 
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -165,7 +165,21 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:5, obstacles:[R(70,320,250,18,'green'),R(120,260,150,18,'sand'),R(160,210,70,16,'brown')]},
   ],
-  // 6) Chilling Cemetery — hardest course, gravestones
+  // 6) Risky Reach — lots of obstacles, tricky layouts, par 37
+  [
+    {start:{x:300,y:120}, cup:{x:20,y:620},  par:4, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
+    {start:{x:60,y:560},  cup:{x:330,y:120}, par:4, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
+    {start:{x:330,y:560}, cup:{x:60,y:110},  par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
+    {start:{x:195,y:560}, cup:{x:195,y:120}, par:4, obstacles:[R(80,340,230,18,'green'),R(120,280,120,18,'sand')]},
+    {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(60,260,270,18,'brown'),R(200,300,80,18,'sand')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(90,320,230,18,'sand'),R(140,240,120,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:60}, par:5, obstacles:[R(70,340,250,18,'green'),R(200,200,200,60,'sand'),R(10,140,150,60,'sand')]},
+    {start:{x:60,y:560},  cup:{x:330,y:110}, par:4, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
+  ],
+
+
+  // 7) Chilling Cemetery — hardest course, gravestones
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(160,105,70,90,'grave')]},
     {start:{x:370,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
@@ -194,24 +208,40 @@ const defaultState = {
     {name:'Forest Path',   unlocked:false, best:null},
     {name:'Emerald Slides',unlocked:false, best:null},
     {name:'Chaos Peaks',   unlocked:false, best:null},
+    {name:'Risky Reach',   unlocked:false, best:null},
     {name:'Chilling Cemetery', unlocked:true, best:null}, // auto-unlocked
   ]
 };
 let state = loadState();
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
-function loadState(){
-  try{ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return structuredClone(defaultState);
-    const parsed = JSON.parse(raw);
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
     const merged = structuredClone(defaultState);
-    Object.assign(merged, parsed);
-    for(let i=0;i<merged.courses.length;i++){
-      if(parsed.courses && parsed.courses[i]) Object.assign(merged.courses[i], parsed.courses[i]);
+
+    if(parsed.coins != null) merged.coins = parsed.coins;
+    if(parsed.ownedBalls) merged.ownedBalls = parsed.ownedBalls;
+    if(parsed.selectedBall) merged.selectedBall = parsed.selectedBall;
+
+    // merge courses by name, not by index
+    if(parsed.courses) {
+      parsed.courses.forEach(c => {
+        const target = merged.courses.find(mc => mc.name === c.name);
+        if(target) Object.assign(target, c);
+      });
     }
-    if(!merged.ownedBalls) merged.ownedBalls={white:true};
-    if(!merged.selectedBall) merged.selectedBall='white';
+
     return merged;
-  }catch{ return structuredClone(defaultState); }
+  } catch {
+    return structuredClone(defaultState);
+  }
 }
+
+
+
+
+
 function resetProgress(){
   localStorage.removeItem(SAVE_KEY);
   state = structuredClone(defaultState);
@@ -431,8 +461,8 @@ function update(){
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // If current course is Chilling Cemetery (index 5), draw brown floor; otherwise draw fairway stripes
-  if(currentCourseIdx === 5){
+  // If current course is Chilling Cemetery (index 6), draw brown floor; otherwise draw fairway stripes
+  if(currentCourseIdx === 6){
     // brown cemetery floor
     ctx.fillStyle = '#5a3d2b';
     ctx.fillRect(0,0,canvas.width,canvas.height);
