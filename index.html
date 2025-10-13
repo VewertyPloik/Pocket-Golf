@@ -6,7 +6,7 @@
 <title>Pocket Golf</title>
 <style>
   :root{
-    --bg:#0b5d2a; --fg:#e9fff0; --panel:#0f7a37; --shadow:rgba(0,0,0,.35);
+    --bg:#c2ffdb; --fg:#82faa8; --panel:#2d851d; --shadow:rgba(0,0,0,.35);
     --accent:#a0ffcf; --ink:#06381a;
   }
   *{box-sizing:border-box}
@@ -17,7 +17,7 @@
   .card{background:linear-gradient(180deg,#118640,#0e6b33);border:1px solid #0b5526;border-radius:16px;box-shadow:0 12px 22px var(--shadow) inset,0 8px 18px var(--shadow);padding:12px;margin:10px 0}
   .row{display:flex;gap:8px;flex-wrap:wrap}
   .stack{display:flex;flex-direction:column;gap:8px}
-  button{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:800;color:var(--ink);background:linear-gradient(180deg,#cbffd6,#83ffb6);box-shadow:0 4px 0 #3db174,0 8px 18px var(--shadow);cursor:pointer}
+  button{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:800;color:var(--ink);background:linear-gradient(180deg, #c2ffdb,#3fd17b);box-shadow:0 4px 0 #3db174,0 8px 18px var(--shadow);cursor:pointer}
   button[disabled]{opacity:.5;filter:grayscale(40%);box-shadow:none;cursor:not-allowed}
   .ghost{background:linear-gradient(180deg,#eafff1,#b7ffd2)}
   #menu,#shop,#game{display:none}
@@ -36,7 +36,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.8</h1>
+    <h1>Pocket Golf - v1.9</h1>
 
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -339,10 +339,10 @@ const summaryEl = document.getElementById('summary');
 const summaryBody = document.getElementById('summaryBody');
 
 const COIN_VALUE = 5; // each coin gives 5 coins
-const MAX_PULL = 200;
+const MAX_PULL = 220;
 const STOP_SPEED = 0.10;
-const DRIVER_MAX_SPEED = 7.0;
-const PUTTER_MAX_SPEED =4.0 // 50% harder than previous 1.3
+const DRIVER_MAX_SPEED = 7.5;
+const PUTTER_MAX_SPEED =4.5 // 50% harder than previous 1.3
 
 let currentCourseIdx=0, holeIdx=0; // 0..8
 let strokes=0, totalScore=0; // numeric relative to par
