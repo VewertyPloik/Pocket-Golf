@@ -32,17 +32,33 @@
   /* Summary overlay */
   #summary{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;z-index:10}
   #summary .panel{max-width:420px;width:100%;background:linear-gradient(180deg,#f0fff6,#cfffdf);color:#08371a;border-radius:16px;padding:16px;box-shadow:0 20px 30px var(--shadow)}
+  select.sort-select{appearance:none;padding:8px 10px;border-radius:10px;background:#eafff1;border:1px solid rgba(0,0,0,.08);font-weight:800;color:var(--ink)}
+  .order-note{font-size:12px;color:#eafff2;opacity:.9;background:rgba(0,0,0,.08);padding:6px;border-radius:8px}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.11</h1>
+    <h1>Pocket Golf - v1.12 Thanksgiving Update</h1>
 
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
         <strong>https://vewertyploik.github.io/Pocket-Golf-1v1/</strong>
         <span class="pill">Courses ⬇️ Play 1v1 (Beta) ⬆️ </span>
       </div>
+
+      <!-- Sorting control -->
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="tiny" for="sortSelect">Sort:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="all">All Courses</option>
+            <option value="level">Level Courses</option>
+            <option value="holiday">Holiday Courses</option>
+          </select>
+        </div>
+        <div class="order-note tiny" id="orderNote">All Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy Chilling Cemetery Turkey Journey (NEW)</div>
+      </div>
+
       <div id="courseList" class="stack"></div>
       <div class="card">
         <strong>Best & Par</strong>
@@ -104,8 +120,10 @@
 // ======= Preset Courses (6 x 9 holes) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
 // Each hole: {start:{x,y}, cup:{x,y}, par, obstacles:[...]}
+// NOTE: swapped the positions of Chilling Cemetery and Field Frenzy so that
+// index 6 is Field Frenzy and index 7 is Chilling Cemetery (per requested order).
 const COURSES = [
-  // 1) Meadow Run — beginner, open fairways
+  // 0) Meadow Run — beginner, open fairways
   [
     {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(80,260,230,22,'sand')]},
     {start:{x:60,y:560},  cup:{x:320,y:110}, par:3, obstacles:[R(140,340,120,20,'green')]},
@@ -117,7 +135,7 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(90,280,210,18,'brown')]},
   ],
-  // 2) Desert Dunes — sand-heavy, careful routing
+  // 1) Desert Dunes — sand-heavy, careful routing
   [
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(40,380,310,24,'sand'),R(60,280,270,20,'sand')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
@@ -129,7 +147,7 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},
   ],
-  // 3) Forest Path — brown bumpers, precision banks
+  // 2) Forest Path — brown bumpers, precision banks
   [
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
     {start:{x:60,y:560},  cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
@@ -141,7 +159,7 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
     {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},
   ],
-  // 4) Emerald Slides — green bouncers, ricochet play
+  // 3) Emerald Slides — green bouncers, ricochet play
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
@@ -153,7 +171,7 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},
   ],
-  // 5) Chaos Peaks — mixed, tight gaps, highest par
+  // 4) Chaos Peaks — mixed, tight gaps, highest par
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
@@ -163,9 +181,10 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(90,320,230,18,'green'),R(120,240,160,18,'brown')]},
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R (-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
   ],
-  // 6) Risky Reach — lots of obstacles, tricky layouts, par 37
+  // 5) Risky Reach — lots of obstacles, tricky layouts, par 37
+  // (kept original Risky Reach layout intact — no cemetery obstacles or floor here)
   [
     {start:{x:300,y:120}, cup:{x:20,y:620},  par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
@@ -178,8 +197,22 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
   ],
 
+  // 6) Field Frenzy — fun, balanced, par 32
+  // (moved here so it unlocks after finishing Risky Reach (index 5))
+  [
+    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280, 40,'brown'),R(100,290,360,45,'sand')]},
+    {start:{x:60,y:560},  cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
+    {start:{x:55,y:560}, cup:{x:195,y:50},  par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
+    {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
+    {start:{x:60,y:560},  cup:{x:330,y:90},  par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:110},  par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
+    {start:{x:60,y:560},  cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
+    {start:{x:60,y:560},  cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
+  ],
 
   // 7) Chilling Cemetery — hardest course, gravestones
+  // (auto-unlocked; kept gravestones and cemetery floor here)
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(160,105,70,90,'grave')]},
     {start:{x:370,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
@@ -192,20 +225,18 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,260,210,18,'grave')]},
   ],
 
-  // 8) Field Frenzy — fun, balanced, par 32
+  // 8) Turkey Journey (NEW) — Thanksgiving course; orange floor + brown obstacles; par 28 (sum of 9 holes)
   [
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280, 40,'brown'),R(100,290,360,45,'sand')]},
-    {start:{x:60,y:560},  cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
-    {start:{x:55,y:560}, cup:{x:195,y:50},  par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:90},  par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110},  par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
-{start:{x:60,y:560},  cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
-
+    {start:{x:195,y:560}, cup:{x:195,y:90},  par:4, obstacles:[R(-175,150,500,40,'brown'), R(200,250,500,40,'brown')]},
+    {start:{x:60,y:560},  cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120},  par:2, obstacles:[R(90,320,230,18,'brown')]},
+    {start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150, 'brown')]},
+    {start:{x:60,y:560},  cup:{x:330,y:90},  par:2, obstacles:[R(150,320,80,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100},  par:2, obstacles:[R(110,320,170,18,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(120,320,150,18,'brown')]},
+    {start:{x:60,y:560},  cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,320,230,18,'brown')]},
   ],
-
 ];
 
 // ======= Derived Course Pars =======
@@ -224,8 +255,9 @@ const defaultState = {
     {name:'Emerald Slides',unlocked:false, best:null},
     {name:'Chaos Peaks',   unlocked:false, best:null},
     {name:'Risky Reach',   unlocked:false, best:null},
-    {name:'Chilling Cemetery', unlocked:true, best:null}, // auto-unlocked
-    {name:'Field Frenzy', unlocked:false,  best:null},
+    {name:'Field Frenzy',  unlocked:false, best:null}, // now index 6; unlocked after completing Risky Reach (index 5)
+    {name:'Chilling Cemetery', unlocked:true, best:null}, // auto-unlocked (index 7)
+    {name:'Turkey Journey', unlocked:true, best:null}, // NEW course, auto-unlocked (index 8)
   ]
 };
 let state = loadState();
@@ -290,20 +322,53 @@ function hide(el){ el.style.display='none'; }
 
 function scoreToString(s){ if(s===0) return 'E'; return s>0?`+${s}`:`${s}`; }
 
+let currentSort = 'all'; // 'all' | 'level' | 'holiday'
+
+// Predefined orders (indices) — matches your requested display orders
+const ORDER_ALL = [0,1,2,3,4,5,6,7,8];
+const ORDER_LEVEL = [0,1,2,3,4,5,6]; // now includes Field Frenzy at index 6
+const ORDER_HOLIDAY = [7,8]; // Chilling Cemetery (7) and Turkey Journey (8)
+
 function renderMenu(){
   hide(shopEl); hide(gameEl); show(menuEl);
   document.getElementById('menuCoins').textContent = state.coins;
   courseListEl.innerHTML='';
-  state.courses.forEach((c,i)=>{
+
+  // pick order
+  let order = ORDER_ALL;
+  if(currentSort==='level') order = ORDER_LEVEL;
+  else if(currentSort==='holiday') order = ORDER_HOLIDAY;
+
+  order.forEach(i=>{
+    const c = state.courses[i];
+    if(!c) return;
     const btn=document.createElement('button');
     const par = COURSE_PAR[i];
     const best = c.best==null? 'N/A' : scoreToString(c.best);
-    btn.textContent = `${c.name} (Par ${par}) — Best: ${best}` + (c.unlocked?'':' 🔒');
+    // append (NEW) text specifically for Turkey Journey in the All/Holiday lists if user wants to see it
+    let displayName = c.name;
+    if(i===8) displayName += ' (NEW)';
+    btn.textContent = `${displayName} (Par ${par}) — Best: ${best}` + (c.unlocked?'':' 🔒');
     btn.disabled=!c.unlocked; btn.onclick=()=>startCourse(i);
     courseListEl.appendChild(btn);
   });
+
   bestScoresEl.innerHTML = state.courses.map((c,i)=>`${c.name}: Par ${COURSE_PAR[i]} • Best: ${c.best==null? 'N/A' : scoreToString(c.best)}`).join('<br>');
+  // update order note text for clarity
+  const note = document.getElementById('orderNote');
+  if(currentSort==='all'){
+    note.textContent = 'All Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy Chilling Cemetery Turkey Journey (NEW)';
+  } else if(currentSort==='level'){
+    note.textContent = 'Level Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy';
+  } else {
+    note.textContent = 'Holiday Courses Order: Chilling Cemetery Turkey Journey (NEW)';
+  }
 }
+
+document.getElementById('sortSelect').addEventListener('change', e=>{
+  currentSort = e.target.value;
+  renderMenu();
+});
 
 function openShop(){ hide(menuEl); show(shopEl); renderShop(); }
 function backToMenu(){ renderMenu(); }
@@ -382,7 +447,10 @@ function endCourse(){
   if(course.best==null || totalScore < course.best){ course.best = totalScore; }
   const par = COURSE_PAR[currentCourseIdx];
   const resultOK = totalScore <= 0;
+  // unlock next course in default order (by index)
   if(resultOK && state.courses[currentCourseIdx+1]){ state.courses[currentCourseIdx+1].unlocked = true; }
+
+  // Save state after unlocking/recording
   saveState();
   // summary overlay
   show(summaryEl);
@@ -478,12 +546,24 @@ function update(){
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // If current course is Chilling Cemetery (index 6), draw brown floor; otherwise draw fairway stripes
-  if(currentCourseIdx === 6){
+  // Special floor rendering:
+  // If current course is Chilling Cemetery (index 7), draw brown cemetery floor;
+  // If current course is Turkey Journey (index 8), draw orange Thanksgiving floor;
+  // otherwise draw fairway stripes
+  if(currentCourseIdx === 7){
     // brown cemetery floor
     ctx.fillStyle = '#5a3d2b';
     ctx.fillRect(0,0,canvas.width,canvas.height);
     // subtle darker stripes
+    for(let i=0;i<8;i++){
+      ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
+      ctx.fillRect(0,i*80,canvas.width,40);
+    }
+  } else if(currentCourseIdx === 8){
+    // Turkey Journey orange floor
+    ctx.fillStyle = '#ffb86b'; // warm orange
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // subtle darker bands for texture
     for(let i=0;i<8;i++){
       ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
       ctx.fillRect(0,i*80,canvas.width,40);
