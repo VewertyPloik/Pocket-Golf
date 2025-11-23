@@ -61,29 +61,23 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.14 Thanksgiving Update</h1>
-
+    <h1></h1>
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <strong>https://vewertyploik.github.io/Pocket-Golf-1v1/</strong>
-        <span class="pill">Courses ⬇️ Play 1v1 (Beta) ⬆️ </span>
+        <strong>POCKET GOLF</strong>
+        <span class="">version 1.15</span>
       </div>
-
-      <!-- Sorting control -->
-      <div class="row" style="align-items:center;justify-content:space-between">
-        <div style="display:flex;gap:8px;align-items:center">
-          <label class="tiny" for="sortSelect">Sort:</label>
+      <!-- Sorting + Gift button on the same row -->
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:4px;align-items:center">
+          <label class="tiny" for="sortSelect"></label>
           <select id="sortSelect" class="sort-select">
             <option value="all">All Courses</option>
             <option value="level">Level Courses</option>
             <option value="holiday">Holiday Courses</option>
           </select>
         </div>
-        <div class="order-note tiny" id="orderNote">All Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy Chilling Cemetery Turkey Journey (NEW)</div>
-      </div>
-      <!-- GIFT BUTTON FOR COINS -->
-      <div class="row" style="justify-content:center">
-        <button class="ghost" id="giftBtn">🎁 Gift (Get Coins!)</button>
+        <button class="ghost" id="giftBtn">Gift (Get Coins!)</button>
       </div>
       <div id="courseList" class="stack"></div>
       <div class="card">
@@ -98,7 +92,6 @@
         </div>
       </div>
     </div>
-
     <div id="shop" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
         <strong>Shop</strong>
@@ -109,7 +102,6 @@
         <button class="ghost" onclick="backToMenu()">Back</button>
       </div>
     </div>
-
     <div id="game" class="card">
       <div id="hud">
         <div class="left">
@@ -130,7 +122,6 @@
       <div class="tiny">Pull back on the ball to aim.</div>
     </div>
   </div>
-
   <!-- End-of-course summary overlay -->
   <div id="summary">
     <div class="panel">
@@ -141,147 +132,133 @@
       </div>
     </div>
   </div>
-
   <!-- Gift Popup Overlay -->
   <div id="giftPopup">
     <div class="panel" id="giftPopupMsg">...</div>
   </div>
-
 <script>
 // ======= Preset Courses (6 x 9 holes) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
-// Each hole: {start:{x,y}, cup:{x,y}, par, obstacles:[...]}
-// NOTE: swapped the positions of Chilling Cemetery and Field Frenzy so that
-// index 6 is Field Frenzy and index 7 is Chilling Cemetery (per requested order).
 const COURSES = [
-  // omitted for brevity, unchanged
-  // ... (All course data remains unchanged)
-  // <--- Place your original courses code here, it's unchanged --->
   [
     {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(80,260,230,22,'sand')]},
-    {start:{x:60,y:560},  cup:{x:320,y:110}, par:4, obstacles:[R(140,340,120,20,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:4, obstacles:[R(100,300,190,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:320,y:110}, par:4, obstacles:[R(140,340,120,20,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:4, obstacles:[R(100,300,190,18,'brown')]},
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(60,360,270,20,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:4, obstacles:[R(150,300,60,18,'green'),R(200,220,80,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(120,320,160,22,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(80,340,230,18,'green')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(90,280,210,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:4, obstacles:[R(150,300,60,18,'green'),R(200,220,80,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,320,160,22,'sand')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(80,340,230,18,'green')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(90,280,210,18,'brown')]},
   ],
   [
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(40,380,310,24,'sand'),R(60,280,270,20,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(90,360,230,24,'sand'),R(120,260,160,20,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(70,240,250,24,'sand'),R(100,320,190,20,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(70,340,250,24,'sand'),R(150,260,80,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(60,360,270,24,'sand'),R(110,260,170,22,'sand')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,360,230,24,'sand'),R(120,260,160,20,'sand')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,240,250,24,'sand'),R(100,320,190,20,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,340,250,24,'sand'),R(150,260,80,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(60,360,270,24,'sand'),R(110,260,170,22,'sand')]},
     {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(70,340,250,22,'sand'),R(130,260,130,20,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},
+    {start:{x:60,y:560}, cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},
   ],
   [
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
-    {start:{x:60,y:560},  cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110},  par:3, obstacles:[R(90,320,230,16,'brown'),R(120,240,160,16,'brown')]},
+    {start:{x:60,y:560}, cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(90,320,230,16,'brown'),R(120,240,160,16,'brown')]},
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(70,340,250,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:100}, par:3, obstacles:[R(140,260,120,16,'brown'),R(160,320,70,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(60,260,270,18,'brown'),R(120,340,150,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(120,320,150,16,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(140,260,120,16,'brown'),R(160,320,70,16,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(60,260,270,18,'brown'),R(120,340,150,18,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,16,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(80,320,230,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(80,320,230,18,'green')]},
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(70,340,250,18,'green'),R(120,260,150,18,'green')]},
-    {start:{x:60,y:560},  cup:{x:330,y:90},  par:3, obstacles:[R(150,320,80,18,'green'),R(60,260,270,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(110,320,170,18,'green'),R(120,240,150,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(120,320,150,18,'green')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},
+    {start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(150,320,80,18,'green'),R(60,260,270,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,320,170,18,'green'),R(120,240,150,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'green')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(110,360,170,20,'sand'),R(100,280,200,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,360,170,20,'sand'),R(100,280,200,18,'green')]},
     {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(60,340,270,18,'green'),R(120,260,150,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(70,360,250,20,'sand'),R(140,280,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:3, obstacles:[R(90,320,230,18,'green'),R(120,240,160,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,360,250,20,'sand'),R(140,280,120,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,320,230,18,'green'),R(120,240,160,18,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
+    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
   ],
   [
-    {start:{x:300,y:120}, cup:{x:20,y:620},  par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110},  par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
+    {start:{x:300,y:120}, cup:{x:20,y:620}, par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
+    {start:{x:330,y:560}, cup:{x:60,y:110}, par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,340,230,18,'green'),R(120,280,120,18,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:100}, par:3, obstacles:[R(60,260,270,18,'brown'),R(200,300,80,18,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,320,230,18,'sand'),R(140,240,120,18,'green')]},
+    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(60,260,270,18,'brown'),R(200,300,80,18,'sand')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,320,230,18,'sand'),R(140,240,120,18,'green')]},
     {start:{x:195,y:560}, cup:{x:195,y:60}, par:4, obstacles:[R(70,340,250,18,'green'),R(200,200,200,60,'sand'),R(10,140,150,60,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
   ],
   [
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280, 40,'brown'),R(100,290,360,45,'sand')]},
-    {start:{x:60,y:560},  cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
-    {start:{x:55,y:560}, cup:{x:195,y:50},  par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
+    {start:{x:60,y:560}, cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
+    {start:{x:55,y:560}, cup:{x:195,y:50}, par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
-    {start:{x:60,y:560},  cup:{x:330,y:90},  par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110},  par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
+    {start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(160,105,70,90,'grave')]},
-    {start:{x:370,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(120,300,150,18,'grave')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(160,105,70,90,'grave')]},
+    {start:{x:370,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,300,150,18,'grave')]},
     {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(90,280,210,18,'grave')]},
-    {start:{x:60,y:560},  cup:{x:330,y:90},  par:2, obstacles:[R(140,260,120,18,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:2, obstacles:[R(100,240,190,18,'grave')]},
+    {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(140,260,120,18,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(100,240,190,18,'grave')]},
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'grave')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,260,210,18,'grave')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
+    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,260,210,18,'grave')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:4, obstacles:[R(-175,150,500,40,'brown'), R(200,250,500,40,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120},  par:2, obstacles:[R(90,320,230,18,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'), R(200,250,500,40,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(90,320,230,18,'brown')]},
     {start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150, 'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:90},  par:2, obstacles:[R(150,320,80,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:2, obstacles:[R(110,320,170,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(120,320,150,18,'brown')]},
-    {start:{x:60,y:560},  cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,320,230,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(150,320,80,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:2, obstacles:[R(110,320,170,18,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
+    {start:{x:60,y:560}, cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
+    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown')]},
   ],
 ];
-
-
-// ======= Derived Course Pars =======
 const COURSE_PAR = COURSES.map(course => course.reduce((a,h)=>a+h.par,0));
-
-// ======= Persistent State =======
 const SAVE_KEY = 'pocket_golf_v4';
-const GIFT_KEY = 'pocket_golf_gift_v2'; // new key for gift cooldown
+const GIFT_KEY = 'pocket_golf_gift_v2';
 const defaultState = {
   coins: 0,
   ownedBalls: { white:true },
   selectedBall: 'white',
   courses: [
-    {name:'Meadow Run',    unlocked:true,  best:null},
-    {name:'Desert Dunes',  unlocked:false, best:null},
-    {name:'Forest Path',   unlocked:false, best:null},
+    {name:'Meadow Run', unlocked:true, best:null},
+    {name:'Desert Dunes', unlocked:false, best:null},
+    {name:'Forest Path', unlocked:false, best:null},
     {name:'Emerald Slides',unlocked:false, best:null},
-    {name:'Chaos Peaks',   unlocked:false, best:null},
-    {name:'Risky Reach',   unlocked:false, best:null},
-    {name:'Field Frenzy',  unlocked:false, best:null}, // now index 6; unlocked after completing Risky Reach (index 5)
-    {name:'Chilling Cemetery', unlocked:true, best:null}, // auto-unlocked (index 7)
-    {name:'Turkey Journey', unlocked:true, best:null}, // NEW course, auto-unlocked (index 8)
+    {name:'Chaos Peaks', unlocked:false, best:null},
+    {name:'Risky Reach', unlocked:false, best:null},
+    {name:'Field Frenzy', unlocked:false, best:null},
+    {name:'Chilling Cemetery', unlocked:true, best:null},
+    {name:'Turkey Journey', unlocked:true, best:null},
   ]
 };
-// Gift system persistent storage
 let giftState = { lastGift: 0 };
 function saveGiftState() {
   localStorage.setItem(GIFT_KEY, JSON.stringify(giftState));
@@ -295,7 +272,6 @@ function loadGiftState() {
     giftState.lastGift = 0;
   }
 }
-
 let state = loadState();
 loadGiftState();
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
@@ -304,36 +280,29 @@ function loadState() {
     const raw = localStorage.getItem(SAVE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
     const merged = structuredClone(defaultState);
-
     if(parsed.coins != null) merged.coins = parsed.coins;
     if(parsed.ownedBalls) merged.ownedBalls = parsed.ownedBalls;
     if(parsed.selectedBall) merged.selectedBall = parsed.selectedBall;
-
-    // merge courses by name, not by index
     if(parsed.courses) {
       parsed.courses.forEach(c => {
         const target = merged.courses.find(mc => mc.name === c.name);
         if(target) Object.assign(target, c);
       });
     }
-
     return merged;
   } catch {
     return structuredClone(defaultState);
   }
 }
-
 function resetProgress(){
   localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(GIFT_KEY); // reset gift cooldown too
+  localStorage.removeItem(GIFT_KEY);
   state = structuredClone(defaultState);
   giftState.lastGift = 0;
   saveState();
   saveGiftState();
   renderMenu();
 }
-
-// ======= UI (Menu/Shop) =======
 const menuEl = document.getElementById('menu');
 const shopEl = document.getElementById('shop');
 const gameEl = document.getElementById('game');
@@ -342,77 +311,53 @@ const bestScoresEl = document.getElementById('bestScores');
 const giftBtn = document.getElementById('giftBtn');
 const giftPopup = document.getElementById('giftPopup');
 const giftPopupMsg = document.getElementById('giftPopupMsg');
-
 const BALL_STORE = [
-  {id:'white',  name:'Classic White', price:0,   color:'#ffffff'},
-  {id:'red',    name:'Ruby Red',       price:25,  color:'#ff4d4d'},
-  {id:'blue',   name:'Ocean Blue',     price:25,  color:'#4d8dff'},
-  {id:'yellow', name:'Sun Yellow',     price:50,  color:'#ffe14d'},
-  {id:'purple', name:'Royal Purple',   price:100, color:'#a04dff'},
-  {id:'mint',   name:'Mint Green',     price:150, color:'#7dffc4'},
-  {id:'teal',   name:'Great Teal',     price:215, color:'#008080'},
-  {id:'light',  name:'Exotic Blue',    price:300, color:'#40E0D0'},
-  {id:'pumpkin',name:'Pumpkin Ball',   price:75,   color:'#FF7518'},
+  {id:'white', name:'Classic White', price:0, color:'#ffffff'},
+  {id:'red', name:'Ruby Red', price:25, color:'#ff4d4d'},
+  {id:'blue', name:'Ocean Blue', price:25, color:'#4d8dff'},
+  {id:'yellow', name:'Sun Yellow', price:50, color:'#ffe14d'},
+  {id:'purple', name:'Royal Purple', price:100, color:'#a04dff'},
+  {id:'mint', name:'Mint Green', price:150, color:'#7dffc4'},
+  {id:'teal', name:'Great Teal', price:215, color:'#008080'},
+  {id:'light', name:'Exotic Blue', price:300, color:'#40E0D0'},
+  {id:'pumpkin',name:'Pumpkin Ball', price:75, color:'#FF7518'},
   {id:'thanks', name:'Thanksgiving Ball', price: 75, color:'#85503a'},
 ];
-
 function show(el){ el.style.display='block'; }
 function hide(el){ el.style.display='none'; }
-
 function scoreToString(s){ if(s===0) return 'E'; return s>0?`+${s}`:`${s}`; }
-
-let currentSort = 'all'; // 'all' | 'level' | 'holiday'
-
-// Predefined orders (indices) — matches your requested display orders
+let currentSort = 'all';
 const ORDER_ALL = [0,1,2,3,4,5,6,7,8];
-const ORDER_LEVEL = [0,1,2,3,4,5,6]; // now includes Field Frenzy at index 6
-const ORDER_HOLIDAY = [7,8]; // Chilling Cemetery (7) and Turkey Journey (8)
-
+const ORDER_LEVEL = [0,1,2,3,4,5,6];
+const ORDER_HOLIDAY = [7,8];
 function renderMenu(){
   hide(shopEl); hide(gameEl); show(menuEl);
   document.getElementById('menuCoins').textContent = state.coins;
   courseListEl.innerHTML='';
-
-  // pick order
   let order = ORDER_ALL;
   if(currentSort==='level') order = ORDER_LEVEL;
   else if(currentSort==='holiday') order = ORDER_HOLIDAY;
-
   order.forEach(i=>{
     const c = state.courses[i];
     if(!c) return;
     const btn=document.createElement('button');
     const par = COURSE_PAR[i];
     const best = c.best==null? 'N/A' : scoreToString(c.best);
-    // append (NEW) text specifically for Turkey Journey in the All/Holiday lists if user wants to see it
     let displayName = c.name;
     if(i===8) displayName += ' (NEW)';
     btn.textContent = `${displayName} (Par ${par}) — Best: ${best}` + (c.unlocked?'':' 🔒');
     btn.disabled=!c.unlocked; btn.onclick=()=>startCourse(i);
     courseListEl.appendChild(btn);
   });
-
   bestScoresEl.innerHTML = state.courses.map((c,i)=>`${c.name}: Par ${COURSE_PAR[i]} • Best: ${c.best==null? 'N/A' : scoreToString(c.best)}`).join('<br>');
-  // update order note text for clarity
-  const note = document.getElementById('orderNote');
-  if(currentSort==='all'){
-    note.textContent = 'All Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy Chilling Cemetery Turkey Journey (NEW)';
-  } else if(currentSort==='level'){
-    note.textContent = 'Level Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy';
-  } else {
-    note.textContent = 'Holiday Courses Order: Chilling Cemetery Turkey Journey (NEW)';
-  }
   updateGiftButton();
 }
-
 document.getElementById('sortSelect').addEventListener('change', e=>{
   currentSort = e.target.value;
   renderMenu();
 });
-
 function openShop(){ hide(menuEl); show(shopEl); renderShop(); }
 function backToMenu(){ renderMenu(); }
-
 function renderShop(){
   document.getElementById('coins').textContent = state.coins;
   const wrap=document.getElementById('shopItems');
@@ -431,16 +376,12 @@ function renderShop(){
     row.appendChild(left); row.appendChild(right); wrap.appendChild(row);
   });
 }
-
-// ======= Gift System =======
-const GIFT_COOLDOWN = 3*60*60*1000; // 3 hours in ms
+const GIFT_COOLDOWN = 3*60*60*1000;
 function getGiftCooldownMs() {
-  // Returns milliseconds left until next gift, 0 if ready
   const now = Date.now();
   return Math.max(0, (giftState.lastGift||0) + GIFT_COOLDOWN - now);
 }
 function msToTime(ms) {
-  // In format hh:mm:ss
   let t = Math.ceil(ms/1000);
   let h = Math.floor(t/3600);
   let m = Math.floor((t%3600)/60);
@@ -449,40 +390,33 @@ function msToTime(ms) {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 function updateGiftButton() {
-  // If ready, enable. Else, indicate cooldown
   const cd = getGiftCooldownMs();
   if(cd === 0) {
     giftBtn.disabled = false;
-    giftBtn.textContent = "🎁 Gift (Get Coins!)";
+    giftBtn.textContent = "Gift🎁(Get Coins!)";
   } else {
-    giftBtn.disabled = false; // always clickable, shows popup with time if not ready
-    giftBtn.textContent = `🎁 Gift (Ready in ${msToTime(cd)})`;
+    giftBtn.disabled = false;
+    giftBtn.textContent = `Gift🎁(Not Ready Yet)`;
   }
 }
-
 giftBtn.onclick = function() {
-  // When clicked, check cooldown, show popup with appropriate message
   const cd = getGiftCooldownMs();
   if(cd === 0) {
-    // Gift is ready
-    const amt = Math.floor(5 + Math.random()*16); // 5-20 coins
+    const amt = Math.floor(5 + Math.random()*16);
     state.coins += amt;
     giftState.lastGift = Date.now();
     saveState();
     saveGiftState();
-    renderMenu(); // update coins & button
-    showGiftPopup(`<div style="font-size:22px;">🎉 You got <span style="color:#ef9b13">${amt}</span> coins!</div>`);
+    renderMenu();
+    showGiftPopup(`<div style="font-size:22px;">You got <span style="color:#ef9b13">${amt}</span> coins!</div>`);
   } else {
-    // Not ready
-    showGiftPopup(`<div style="font-size:20px;">⌛ You still need to wait <span style="color:#a06319">${msToTime(cd)}</span> for this to be ready!</div>`);
+    showGiftPopup(`<div style="font-size:20px;">⏳You still need to wait <span style="color:#a06319">${msToTime(cd)}</span> for gift to be ready!</div>`);
   }
 };
-
 function showGiftPopup(msg) {
   giftPopupMsg.innerHTML = msg + `<div class="tiny" style="margin-top:14px;">(Tap anywhere to close)</div>`;
   giftPopup.style.display = "flex";
   setTimeout(()=>{
-    // To allow immediate tap-out, attach tap/click listeners
     giftPopup.onclick = closeGiftPopup;
     giftPopup.ontouchend = closeGiftPopup;
     document.body.addEventListener('keydown', giftPopupEscHandler);
@@ -495,11 +429,8 @@ function closeGiftPopup() {
   document.body.removeEventListener('keydown', giftPopupEscHandler);
 }
 function giftPopupEscHandler(e) {
-  // Allow pressing Esc to close
   if(e.key === "Escape") closeGiftPopup();
 }
-
-// ======= Game =======
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const hudHole = document.getElementById('hudHole');
@@ -510,56 +441,42 @@ const hudCoins = document.getElementById('hudCoins');
 const clubBtn = document.getElementById('clubBtn');
 const summaryEl = document.getElementById('summary');
 const summaryBody = document.getElementById('summaryBody');
-
-const COIN_VALUE = 5; // each coin gives 5 coins
+const COIN_VALUE = 5;
 const MAX_PULL = 220;
 const STOP_SPEED = 0.10;
 const DRIVER_MAX_SPEED = 7.5;
-const PUTTER_MAX_SPEED =4.5 // 50% harder than previous 1.3
-
-let currentCourseIdx=0, holeIdx=0; // 0..8
-let strokes=0, totalScore=0; // numeric relative to par
+const PUTTER_MAX_SPEED =4.5
+let currentCourseIdx=0, holeIdx=0;
+let strokes=0, totalScore=0;
 let currentPar=3;
-let club='driver'; // 'driver' or 'putter'
-let holeTransition=false; // guard to prevent skipping
-
+let club='driver';
+let holeTransition=false;
 const ball={x:195,y:540,vx:0,vy:0,r:9};
 let dragging=false, dragX=0, dragY=0, aimDX=0, aimDY=0, powerPct=0;
 let prevX=ball.x, prevY=ball.y;
-
-let obstacles=[]; // {x,y,w,h,type}
-let coinsOnHole=[]; // {x,y,r}
+let obstacles=[];
+let coinsOnHole=[];
 let cup={x:195,y:70,r:12};
 let startPos={x:195,y:540};
-
 clubBtn.onclick = ()=>{ club = (club==='driver'?'putter':'driver'); clubBtn.textContent = 'Club: ' + (club==='driver'?'Driver':'Putter'); };
-
 function exitGame(){ hide(gameEl); renderMenu(); }
-
 function startCourse(idx){
   currentCourseIdx=idx; holeIdx=0; strokes=0; totalScore=0; club='driver'; clubBtn.textContent='Club: Driver'; holeTransition=false;
   hide(menuEl); hide(shopEl); show(gameEl);
   setupHoleFromPreset();
   requestAnimationFrame(loop);
 }
-
 function nextHole(){
   if(holeIdx===8){ return endCourse(); }
   holeIdx++; holeTransition=false; setupHoleFromPreset();
 }
-
 function endCourse(){
-  // record best & unlock next if E or better
   const course=state.courses[currentCourseIdx];
   if(course.best==null || totalScore < course.best){ course.best = totalScore; }
   const par = COURSE_PAR[currentCourseIdx];
   const resultOK = totalScore <= 0;
-  // unlock next course in default order (by index)
   if(resultOK && state.courses[currentCourseIdx+1]){ state.courses[currentCourseIdx+1].unlocked = true; }
-
-  // Save state after unlocking/recording
   saveState();
-  // summary overlay
   show(summaryEl);
   summaryBody.innerHTML = `Course: <strong>${course.name}</strong><br>`+
     `Total Par: <strong>${par}</strong><br>`+
@@ -567,7 +484,6 @@ function endCourse(){
     `${resultOK? 'Nice! Next course unlocked.' : 'Finish E or better to unlock the next course.'}`;
 }
 function summaryToMenu(){ hide(summaryEl); exitGame(); }
-
 function setupHoleFromPreset(){
   const preset = COURSES[currentCourseIdx][holeIdx];
   startPos = {x:preset.start.x, y:preset.start.y};
@@ -578,14 +494,12 @@ function setupHoleFromPreset(){
   spawnCoins();
   updateHUD();
 }
-
 function spawnCoins(){
   coinsOnHole=[]; const r=Math.random();
   if(r<0.25){ coinsOnHole.push(randCoin()); }
   else if(r<0.35){ coinsOnHole.push(randCoin(), randCoin()); }
 }
 function randCoin(){ return { x: 24+Math.random()*(canvas.width-48), y: 120+Math.random()*(canvas.height-180), r:6 }; }
-
 function updateHUD(){
   hudHole.textContent = `Hole ${holeIdx+1}/9`;
   hudStrokes.textContent = `Strokes: ${strokes}`;
@@ -593,31 +507,22 @@ function updateHUD(){
   hudPar.textContent = `Par ${currentPar}`;
   hudCoins.textContent = state.coins;
 }
-
-// ======= Loop =======
 function loop(){ update(); draw(); requestAnimationFrame(loop); }
-
 function update(){
-  // integrate
   prevX=ball.x; prevY=ball.y;
   ball.x += ball.vx; ball.y += ball.vy;
-  // friction
   ball.vx *= 0.985; ball.vy *= 0.985;
   if(Math.hypot(ball.vx,ball.vy) < STOP_SPEED){ ball.vx=0; ball.vy=0; }
-
-  // walls
   if(ball.x < ball.r){ ball.x=ball.r; ball.vx*=-0.7; }
   if(ball.x > canvas.width-ball.r){ ball.x=canvas.width-ball.r; ball.vx*=-0.7; }
   if(ball.y < ball.r){ ball.y=ball.r; ball.vy*=-0.7; }
   if(ball.y > canvas.height-ball.r){ ball.y=canvas.height-ball.r; ball.vy*=-0.7; }
-
-  // obstacles
   obstacles.forEach(o=>{
     const inside = ball.x>o.x-ball.r && ball.x<o.x+o.w+ball.r && ball.y>o.y-ball.r && ball.y<o.y+o.h+ball.r;
     const wasInside = prevX>o.x-ball.r && prevX<o.x+o.w+ball.r && prevY>o.y-ball.r && prevY<o.y+o.h+ball.r;
     if(inside){
       if(o.type==='sand'){
-        ball.vx *= 0.5; ball.vy *= 0.5; // slow 50%
+        ball.vx *= 0.5; ball.vy *= 0.5;
       } else if(!wasInside){
         const penX = Math.min(Math.abs((o.x-ball.x)+ball.r), Math.abs((o.x+o.w-ball.x)-ball.r));
         const penY = Math.min(Math.abs((o.y-ball.y)+ball.r), Math.abs((o.y+o.h-ball.y)-ball.r));
@@ -626,8 +531,6 @@ function update(){
       }
     }
   });
-
-  // coins
   for(let i=coinsOnHole.length-1;i>=0;i--){
     const c=coinsOnHole[i];
     const d2=(ball.x-c.x)*(ball.x-c.x)+(ball.y-c.y)*(ball.y-c.y);
@@ -636,51 +539,35 @@ function update(){
       state.coins += COIN_VALUE; saveState(); updateHUD();
     }
   }
-
-  // cup (guard against multi-trigger)
   if(!holeTransition){
     const d2=(ball.x-cup.x)*(ball.x-cup.x)+(ball.y-cup.y)*(ball.y-cup.y);
     if(d2 < cup.r*cup.r && Math.hypot(ball.vx,ball.vy) < 1.0){
       holeTransition=true;
-      // finalize hole score
       totalScore += (strokes - currentPar);
       strokes = 0; updateHUD();
       setTimeout(()=>{ nextHole(); }, 400);
     }
   }
 }
-
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Special floor rendering:
-  // If current course is Chilling Cemetery (index 7), draw brown cemetery floor;
-  // If current course is Turkey Journey (index 8), draw orange Thanksgiving floor;
-  // otherwise draw fairway stripes
   if(currentCourseIdx === 7){
-    // brown cemetery floor
     ctx.fillStyle = '#5a3d2b';
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    // subtle darker stripes
     for(let i=0;i<8;i++){
       ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
       ctx.fillRect(0,i*80,canvas.width,40);
     }
   } else if(currentCourseIdx === 8){
-    // Turkey Journey orange floor
-    ctx.fillStyle = '#ffb86b'; // warm orange
+    ctx.fillStyle = '#ffb86b';
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    // subtle darker bands for texture
     for(let i=0;i<8;i++){
       ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
       ctx.fillRect(0,i*80,canvas.width,40);
     }
   } else {
-    // fairway stripes
     for(let i=0;i<8;i++){ ctx.fillStyle = `rgba(255,255,255,${0.03*(i%2)})`; ctx.fillRect(0,i*80,canvas.width,40); }
   }
-
-  // render obstacles
   obstacles.forEach(o=>{
     if(o.type==='sand'){
       const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
@@ -692,12 +579,10 @@ function draw(){
       grd.addColorStop(0,'#77e382'); grd.addColorStop(1,'#34c759');
       ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }else if(o.type==='grave'){
-      // gravestone (gray)
       const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
       grd.addColorStop(0,'#bdbdbd'); grd.addColorStop(1,'#8a8a8a');
       ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,8,true,false);
       ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=2; ctx.stroke();
-      // small etched cross / mark for gravestone detail
       ctx.fillStyle='rgba(0,0,0,0.12)';
       const cx = o.x + o.w/2;
       const cy = o.y + o.h/2 - 4;
@@ -709,29 +594,20 @@ function draw(){
       ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }
   });
-
-  // coins
   coinsOnHole.forEach(c=>{
     const grd=ctx.createRadialGradient(c.x-2,c.y-2,2,c.x,c.y,10);
     grd.addColorStop(0,'#fff8a8'); grd.addColorStop(1,'#e7b100');
     ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
     ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.stroke();
   });
-
-  // cup
   ctx.beginPath(); ctx.arc(cup.x,cup.y,cup.r,0,Math.PI*2); ctx.fillStyle='#0b1110'; ctx.fill();
   ctx.beginPath(); ctx.arc(cup.x,cup.y,cup.r+4,0,Math.PI*2); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=3; ctx.stroke();
-  // flag
   ctx.beginPath(); ctx.moveTo(cup.x, cup.y-cup.r-18); ctx.lineTo(cup.x, cup.y); ctx.strokeStyle='#1b1b1b'; ctx.lineWidth=3; ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cup.x, cup.y-cup.r-18); ctx.lineTo(cup.x+18, cup.y-cup.r-12); ctx.lineTo(cup.x, cup.y-cup.r-6); ctx.closePath(); ctx.fillStyle='#ffd34d'; ctx.fill();
-
-  // ball
   const sel = BALL_STORE.find(b=>b.id===state.selectedBall) || BALL_STORE[0];
   const bgrd = ctx.createRadialGradient(ball.x-3,ball.y-3,2,ball.x,ball.y,ball.r);
   bgrd.addColorStop(0,'#ffffff'); bgrd.addColorStop(1, sel.color);
   ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fillStyle=bgrd; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=2; ctx.stroke();
-
-  // aim line & power label
   if(dragging){
     ctx.beginPath(); ctx.moveTo(ball.x,ball.y); ctx.lineTo(dragX,dragY); ctx.lineWidth=3; ctx.setLineDash([8,6]); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke(); ctx.setLineDash([]);
     ctx.font='bold 16px system-ui, -apple-system, Segoe UI'; ctx.textAlign='center'; ctx.textBaseline='bottom';
@@ -739,33 +615,26 @@ function draw(){
     ctx.fillStyle='#eafff2'; ctx.fillText(`${Math.round(powerPct*100)}%`, ball.x, ball.y-20);
   }
 }
-
 function roundRect(x,y,w,h,r,fill,stroke){
   if(w<2*r) r=w/2; if(h<2*r) r=h/2; ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); if(fill) ctx.fill(); if(stroke) ctx.stroke();
 }
-
-// ======= Input =======
 function getCanvasPoint(clientX,clientY){ const r=canvas.getBoundingClientRect(); const x=(clientX-r.left)*(canvas.width/r.width); const y=(clientY-r.top)*(canvas.height/r.height); return {x,y}; }
 function canShoot(){ return Math.hypot(ball.vx,ball.vy)<0.1 && !holeTransition; }
 function startDrag(x,y){ if(Math.hypot(x-ball.x,y-ball.y)<=26 && canShoot()){ dragging=true; dragX=x; dragY=y; calcAim(); } }
 function moveDrag(x,y){ if(!dragging) return; dragX=x; dragY=y; calcAim(); }
 function endDrag(){ if(!dragging) return; dragging=false; const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL); const ang=Math.atan2(aimDY,aimDX);
-  // club-specific range
   const minPct = (club==='driver'?0.25:0.01); const maxPct=(club==='driver'?1.0:0.60);
   let pct = powerPct; if(pct<minPct) pct=minPct; if(pct>maxPct) pct=maxPct;
   const MAX_SPEED = (club==='driver'? DRIVER_MAX_SPEED : PUTTER_MAX_SPEED);
   const speed = pct * MAX_SPEED;
   ball.vx = -Math.cos(ang)*speed; ball.vy = -Math.sin(ang)*speed; strokes++; updateHUD(); }
 function calcAim(){ aimDX=dragX-ball.x; aimDY=dragY-ball.y; const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL); powerPct = mag / MAX_PULL; }
-
 canvas.addEventListener('touchstart',e=>{ const t=e.touches[0]; const p=getCanvasPoint(t.clientX,t.clientY); startDrag(p.x,p.y); },{passive:true});
 canvas.addEventListener('touchmove', e=>{ const t=e.touches[0]; const p=getCanvasPoint(t.clientX,t.clientY); moveDrag(p.x,p.y); },{passive:true});
 canvas.addEventListener('touchend', ()=> endDrag());
 canvas.addEventListener('mousedown', e=>{ const p=getCanvasPoint(e.clientX,e.clientY); startDrag(p.x,p.y); });
 window.addEventListener('mousemove', e=>{ const p=getCanvasPoint(e.clientX,e.clientY); moveDrag(p.x,p.y); });
 window.addEventListener('mouseup', ()=> endDrag());
-
-// ======= Boot =======
 function init(){ renderMenu(); }
 init();
 </script>
