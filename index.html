@@ -17,11 +17,11 @@
   .card{background:linear-gradient(180deg,#118640,#0e6b33);border:1px solid #0b5526;border-radius:16px;box-shadow:0 12px 22px var(--shadow) inset,0 8px 18px var(--shadow);padding:12px;margin:10px 0}
   .row{display:flex;gap:8px;flex-wrap:wrap}
   .stack{display:flex;flex-direction:column;gap:8px}
-  button{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:800;color:var(--ink);background:linear-gradient(180deg, #c2ffdb,#3fd17b);box-shadow:0 4px 0 #3db174,0 8px 18px var(--shadow);cursor:pointer}
+  button{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:800;color:var(--ink);background:linear-gradient(180deg, #c2ffdb,#3fd17b);box-shadow:0 4px 0 #3db174,0 0 0 0 var(--shadow);}
   button[disabled]{opacity:.5;filter:grayscale(40%);box-shadow:none;cursor:not-allowed}
   .ghost{background:linear-gradient(180deg,#eafff1,#b7ffd2)}
   #menu,#shop,#game{display:none}
-  #game canvas{display:block;width:100%;height:auto;touch-action:none;background:radial-gradient(120% 120% at 50% 0%,#3bbf6a 0%, #219653 40%, #136c3a 100%);border-radius:16px;border:2px solid #0a4c23;box-shadow:0 10px 22px var(--shadow)}
+  #game canvas{display:block;width:100%;height:auto;touch-action:none;background:radial-gradient(120% 120% at 50% 0%,#3bbf6a 0%, #219653 40%, #136c3a 100%);border-radius:16px;border:2px solid #0a4c23;}
   #hud{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800}
   #hud .left,#hud .right{display:flex;gap:8px;align-items:center}
   .pill{padding:4px 8px;border-radius:999px;background:#eafff2;color:var(--ink);font-size:12px}
@@ -34,11 +34,34 @@
   #summary .panel{max-width:420px;width:100%;background:linear-gradient(180deg,#f0fff6,#cfffdf);color:#08371a;border-radius:16px;padding:16px;box-shadow:0 20px 30px var(--shadow)}
   select.sort-select{appearance:none;padding:8px 10px;border-radius:10px;background:#eafff1;border:1px solid rgba(0,0,0,.08);font-weight:800;color:var(--ink)}
   .order-note{font-size:12px;color:#eafff2;opacity:.9;background:rgba(0,0,0,.08);padding:6px;border-radius:8px}
+  /* Gift popup overlay */
+  #giftPopup {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:11;
+    cursor:pointer;
+  }
+  #giftPopup .panel {
+    max-width:340px;
+    width:100%;
+    background:linear-gradient(180deg,#fffbe6,#fbe5bb);
+    color:#6b4a19;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 12px 28px var(--shadow);
+    text-align:center;
+    font-size:16px;
+    font-weight:700;
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Pocket Golf - v1.12 Thanksgiving Update</h1>
+    <h1>Pocket Golf - v1.13 Thanksgiving Update</h1>
 
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
@@ -58,7 +81,10 @@
         </div>
         <div class="order-note tiny" id="orderNote">All Courses Order: Meadow Run Desert Dunes Forest Path Emerald Slides Chaos Peaks Risky Reach Field Frenzy Chilling Cemetery Turkey Journey (NEW)</div>
       </div>
-
+      <!-- GIFT BUTTON FOR COINS -->
+      <div class="row" style="justify-content:center">
+        <button class="ghost" id="giftBtn">🎁 Gift (Get Coins!)</button>
+      </div>
       <div id="courseList" class="stack"></div>
       <div class="card">
         <strong>Best & Par</strong>
@@ -116,6 +142,11 @@
     </div>
   </div>
 
+  <!-- Gift Popup Overlay -->
+  <div id="giftPopup">
+    <div class="panel" id="giftPopupMsg">...</div>
+  </div>
+
 <script>
 // ======= Preset Courses (6 x 9 holes) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
@@ -123,7 +154,9 @@ function R(x,y,w,h,type){ return {x,y,w,h,type}; }
 // NOTE: swapped the positions of Chilling Cemetery and Field Frenzy so that
 // index 6 is Field Frenzy and index 7 is Chilling Cemetery (per requested order).
 const COURSES = [
-  // 0) Meadow Run — beginner, open fairways
+  // omitted for brevity, unchanged
+  // ... (All course data remains unchanged)
+  // <--- Place your original courses code here, it's unchanged --->
   [
     {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(80,260,230,22,'sand')]},
     {start:{x:60,y:560},  cup:{x:320,y:110}, par:3, obstacles:[R(140,340,120,20,'green')]},
@@ -135,7 +168,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(90,280,210,18,'brown')]},
   ],
-  // 1) Desert Dunes — sand-heavy, careful routing
   [
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(40,380,310,24,'sand'),R(60,280,270,20,'sand')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
@@ -147,7 +179,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},
   ],
-  // 2) Forest Path — brown bumpers, precision banks
   [
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
     {start:{x:60,y:560},  cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
@@ -159,7 +190,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
     {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},
   ],
-  // 3) Emerald Slides — green bouncers, ricochet play
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
@@ -171,7 +201,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:100},  par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},
   ],
-  // 4) Chaos Peaks — mixed, tight gaps, highest par
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
@@ -183,8 +212,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
   ],
-  // 5) Risky Reach — lots of obstacles, tricky layouts, par 37
-  // (kept original Risky Reach layout intact — no cemetery obstacles or floor here)
   [
     {start:{x:300,y:120}, cup:{x:20,y:620},  par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
     {start:{x:60,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
@@ -196,9 +223,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
   ],
-
-  // 6) Field Frenzy — fun, balanced, par 32
-  // (moved here so it unlocks after finishing Risky Reach (index 5))
   [
     {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280, 40,'brown'),R(100,290,360,45,'sand')]},
     {start:{x:60,y:560},  cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
@@ -210,9 +234,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
     {start:{x:60,y:560},  cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
   ],
-
-  // 7) Chilling Cemetery — hardest course, gravestones
-  // (auto-unlocked; kept gravestones and cemetery floor here)
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:3, obstacles:[R(160,105,70,90,'grave')]},
     {start:{x:370,y:560},  cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
@@ -224,8 +245,6 @@ const COURSES = [
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
     {start:{x:330,y:560}, cup:{x:60,y:90},   par:3, obstacles:[R(90,260,210,18,'grave')]},
   ],
-
-  // 8) Turkey Journey (NEW) — Thanksgiving course; orange floor + brown obstacles; par 28 (sum of 9 holes)
   [
     {start:{x:195,y:560}, cup:{x:195,y:90},  par:4, obstacles:[R(-175,150,500,40,'brown'), R(200,250,500,40,'brown')]},
     {start:{x:60,y:560},  cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
@@ -239,11 +258,13 @@ const COURSES = [
   ],
 ];
 
+
 // ======= Derived Course Pars =======
 const COURSE_PAR = COURSES.map(course => course.reduce((a,h)=>a+h.par,0));
 
 // ======= Persistent State =======
 const SAVE_KEY = 'pocket_golf_v4';
+const GIFT_KEY = 'pocket_golf_gift_v2'; // new key for gift cooldown
 const defaultState = {
   coins: 0,
   ownedBalls: { white:true },
@@ -260,7 +281,23 @@ const defaultState = {
     {name:'Turkey Journey', unlocked:true, best:null}, // NEW course, auto-unlocked (index 8)
   ]
 };
+// Gift system persistent storage
+let giftState = { lastGift: 0 };
+function saveGiftState() {
+  localStorage.setItem(GIFT_KEY, JSON.stringify(giftState));
+}
+function loadGiftState() {
+  try {
+    const raw = localStorage.getItem(GIFT_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    if(parsed.lastGift) giftState.lastGift = parsed.lastGift;
+  } catch {
+    giftState.lastGift = 0;
+  }
+}
+
 let state = loadState();
+loadGiftState();
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 function loadState() {
   try {
@@ -286,14 +323,13 @@ function loadState() {
   }
 }
 
-
-
-
-
 function resetProgress(){
   localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem(GIFT_KEY); // reset gift cooldown too
   state = structuredClone(defaultState);
+  giftState.lastGift = 0;
   saveState();
+  saveGiftState();
   renderMenu();
 }
 
@@ -303,6 +339,9 @@ const shopEl = document.getElementById('shop');
 const gameEl = document.getElementById('game');
 const courseListEl = document.getElementById('courseList');
 const bestScoresEl = document.getElementById('bestScores');
+const giftBtn = document.getElementById('giftBtn');
+const giftPopup = document.getElementById('giftPopup');
+const giftPopupMsg = document.getElementById('giftPopupMsg');
 
 const BALL_STORE = [
   {id:'white',  name:'Classic White', price:0,   color:'#ffffff'},
@@ -363,6 +402,7 @@ function renderMenu(){
   } else {
     note.textContent = 'Holiday Courses Order: Chilling Cemetery Turkey Journey (NEW)';
   }
+  updateGiftButton();
 }
 
 document.getElementById('sortSelect').addEventListener('change', e=>{
@@ -385,11 +425,78 @@ function renderShop(){
     const right=document.createElement('div');
     const owned = !!state.ownedBalls[item.id];
     const btn=document.createElement('button');
-    if(owned){ btn.textContent = state.selectedBall===item.id? 'Selected' : 'Select'; if(state.selectedBall===item.id) btn.disabled=true; btn.onclick=()=>{state.selectedBall=item.id; saveState(); renderShop();}; }
-    else{ btn.textContent=`Buy (${item.price})`; btn.disabled = state.coins < item.price; btn.onclick=()=>{ if(state.coins>=item.price){ state.coins-=item.price; state.ownedBalls[item.id]=true; state.selectedBall=item.id; saveState(); renderShop(); } }; }
+    if(owned){ btn.textContent = state.selectedBall===item.id? 'Selected' : 'Select'; if(state.selectedBall===item.id) btn.disabled=true; btn.onclick=()=>{state.selectedBall=item.id; saveState(); renderShop();}}
+    else{ btn.textContent=`Buy (${item.price})`; btn.disabled = state.coins < item.price; btn.onclick=()=>{ if(state.coins>=item.price){ state.coins-=item.price; state.ownedBalls[item.id]=true; state.selectedBall=item.id; saveState(); renderShop();}}}
     right.appendChild(btn);
     row.appendChild(left); row.appendChild(right); wrap.appendChild(row);
   });
+}
+
+// ======= Gift System =======
+const GIFT_COOLDOWN = 3*60*60*1000; // 3 hours in ms
+function getGiftCooldownMs() {
+  // Returns milliseconds left until next gift, 0 if ready
+  const now = Date.now();
+  return Math.max(0, (giftState.lastGift||0) + GIFT_COOLDOWN - now);
+}
+function msToTime(ms) {
+  // In format hh:mm:ss
+  let t = Math.ceil(ms/1000);
+  let h = Math.floor(t/3600);
+  let m = Math.floor((t%3600)/60);
+  let s = t%60;
+  let pad = (num) => ("0"+num).slice(-2);
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+function updateGiftButton() {
+  // If ready, enable. Else, indicate cooldown
+  const cd = getGiftCooldownMs();
+  if(cd === 0) {
+    giftBtn.disabled = false;
+    giftBtn.textContent = "🎁 Gift (Get Coins!)";
+  } else {
+    giftBtn.disabled = false; // always clickable, shows popup with time if not ready
+    giftBtn.textContent = `🎁 Gift (Ready in ${msToTime(cd)})`;
+  }
+}
+
+giftBtn.onclick = function() {
+  // When clicked, check cooldown, show popup with appropriate message
+  const cd = getGiftCooldownMs();
+  if(cd === 0) {
+    // Gift is ready
+    const amt = Math.floor(5 + Math.random()*16); // 5-20 coins
+    state.coins += amt;
+    giftState.lastGift = Date.now();
+    saveState();
+    saveGiftState();
+    renderMenu(); // update coins & button
+    showGiftPopup(`<div style="font-size:22px;">🎉 You got <span style="color:#ef9b13">${amt}</span> coins!</div>`);
+  } else {
+    // Not ready
+    showGiftPopup(`<div style="font-size:20px;">⌛ You still need to wait <span style="color:#a06319">${msToTime(cd)}</span> for this to be ready!</div>`);
+  }
+};
+
+function showGiftPopup(msg) {
+  giftPopupMsg.innerHTML = msg + `<div class="tiny" style="margin-top:14px;">(Tap anywhere to close)</div>`;
+  giftPopup.style.display = "flex";
+  setTimeout(()=>{
+    // To allow immediate tap-out, attach tap/click listeners
+    giftPopup.onclick = closeGiftPopup;
+    giftPopup.ontouchend = closeGiftPopup;
+    document.body.addEventListener('keydown', giftPopupEscHandler);
+  },20);
+}
+function closeGiftPopup() {
+  giftPopup.style.display = "none";
+  giftPopup.onclick = null;
+  giftPopup.ontouchend = null;
+  document.body.removeEventListener('keydown', giftPopupEscHandler);
+}
+function giftPopupEscHandler(e) {
+  // Allow pressing Esc to close
+  if(e.key === "Escape") closeGiftPopup();
 }
 
 // ======= Game =======
@@ -598,7 +705,7 @@ function draw(){
       ctx.fillRect(cx-6, cy-1, 12, 2);
     }else{
       const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
-      grd.addColorStop(0,'#a77746'); grd.addColorStop(1,'#7d5a34');
+      grd.addColorStop(0,'#a77746'); grd.addColorStop(1, '#7d5a34');
       ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }
   });
