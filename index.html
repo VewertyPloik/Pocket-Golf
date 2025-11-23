@@ -29,34 +29,11 @@
   .shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.15);padding:10px;border-radius:12px}
   .ball-swatch{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.35);box-shadow:inset 0 8px 10px rgba(255,255,255,.35), inset 0 -6px 10px rgba(0,0,0,.35)}
   .club-toggle{display:flex;gap:8px}
-  /* Summary overlay */
   #summary{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;z-index:10}
   #summary .panel{max-width:420px;width:100%;background:linear-gradient(180deg,#f0fff6,#cfffdf);color:#08371a;border-radius:16px;padding:16px;box-shadow:0 20px 30px var(--shadow)}
   select.sort-select{appearance:none;padding:8px 10px;border-radius:10px;background:#eafff1;border:1px solid rgba(0,0,0,.08);font-weight:800;color:var(--ink)}
-  .order-note{font-size:12px;color:#eafff2;opacity:.9;background:rgba(0,0,0,.08);padding:6px;border-radius:8px}
-  /* Gift popup overlay */
-  #giftPopup {
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:11;
-    cursor:pointer;
-  }
-  #giftPopup .panel {
-    max-width:340px;
-    width:100%;
-    background:linear-gradient(180deg,#fffbe6,#fbe5bb);
-    color:#6b4a19;
-    border-radius:14px;
-    padding:16px;
-    box-shadow:0 12px 28px var(--shadow);
-    text-align:center;
-    font-size:16px;
-    font-weight:700;
-  }
+  #giftPopup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:11;cursor:pointer}
+  #giftPopup .panel{max-width:340px;width:100%;background:linear-gradient(180deg,#fffbe6,#fbe5bb);color:#6b4a19;border-radius:14px;padding:16px;box-shadow:0 12px 28px var(--shadow);text-align:center;font-size:16px;font-weight:700}
 </style>
 </head>
 <body>
@@ -67,9 +44,8 @@
         <strong>POCKET GOLF</strong>
         <span class="">version 1.15</span>
       </div>
-      <!-- Sorting + Gift button on the same row -->
       <div class="row" style="justify-content:space-between;align-items:center">
-        <div style="display:flex;gap:4px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center">
           <label class="tiny" for="sortSelect"></label>
           <select id="sortSelect" class="sort-select">
             <option value="all">All Courses</option>
@@ -80,11 +56,10 @@
         <button class="ghost" id="giftBtn">Gift (Get Coins!)</button>
       </div>
       <div id="courseList" class="stack"></div>
-      <div class="card">
-        <strong>Best & Par</strong>
-        <div id="bestScores" class="tiny"></div>
-      </div>
-      <div class="row" style="justify-content:space-between;align-items:center">
+
+      <!-- "Best & Par" box completely removed -->
+
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:12px">
         <div>Coins: <strong id="menuCoins">0</strong></div>
         <div class="row">
           <button class="ghost" onclick="openShop()">Shop</button>
@@ -92,6 +67,7 @@
         </div>
       </div>
     </div>
+
     <div id="shop" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
         <strong>Shop</strong>
@@ -102,6 +78,7 @@
         <button class="ghost" onclick="backToMenu()">Back</button>
       </div>
     </div>
+
     <div id="game" class="card">
       <div id="hud">
         <div class="left">
@@ -122,7 +99,7 @@
       <div class="tiny">Pull back on the ball to aim.</div>
     </div>
   </div>
-  <!-- End-of-course summary overlay -->
+
   <div id="summary">
     <div class="panel">
       <h3 style="margin:0 0 8px">Course Complete!</h3>
@@ -132,12 +109,13 @@
       </div>
     </div>
   </div>
-  <!-- Gift Popup Overlay -->
+
   <div id="giftPopup">
     <div class="panel" id="giftPopupMsg">...</div>
   </div>
+
 <script>
-// ======= Preset Courses (6 x 9 holes) =======
+// ======= Preset Courses (9 total) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
 const COURSES = [
   [
@@ -207,7 +185,7 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280, 40,'brown'),R(100,290,360,45,'sand')]},
+    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280,40,'brown'),R(100,290,360,45,'sand')]},
     {start:{x:60,y:560}, cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
     {start:{x:55,y:560}, cup:{x:195,y:50}, par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
     {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
@@ -229,10 +207,10 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,260,210,18,'grave')]},
   ],
   [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'), R(200,250,500,40,'brown')]},
+    {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'),R(200,250,500,40,'brown')]},
     {start:{x:60,y:560}, cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
     {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(90,320,230,18,'brown')]},
-    {start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150, 'brown')]},
+    {start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150,'brown')]},
     {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(150,320,80,18,'brown')]},
     {start:{x:330,y:560}, cup:{x:60,y:100}, par:2, obstacles:[R(110,320,170,18,'brown')]},
     {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
@@ -240,7 +218,7 @@ const COURSES = [
     {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown')]},
   ],
 ];
-const COURSE_PAR = COURSES.map(course => course.reduce((a,h)=>a+h.par,0));
+const COURSE_PAR = COURSES.map(c=>c.reduce((a,h)=>a+h.par,0));
 const SAVE_KEY = 'pocket_golf_v4';
 const GIFT_KEY = 'pocket_golf_gift_v2';
 const defaultState = {
@@ -260,17 +238,10 @@ const defaultState = {
   ]
 };
 let giftState = { lastGift: 0 };
-function saveGiftState() {
-  localStorage.setItem(GIFT_KEY, JSON.stringify(giftState));
-}
+function saveGiftState() { localStorage.setItem(GIFT_KEY, JSON.stringify(giftState)); }
 function loadGiftState() {
-  try {
-    const raw = localStorage.getItem(GIFT_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    if(parsed.lastGift) giftState.lastGift = parsed.lastGift;
-  } catch {
-    giftState.lastGift = 0;
-  }
+  try { const p = localStorage.getItem(GIFT_KEY); if(p) giftState = JSON.parse(p); }
+  catch { giftState.lastGift = 0; }
 }
 let state = loadState();
 loadGiftState();
@@ -280,362 +251,261 @@ function loadState() {
     const raw = localStorage.getItem(SAVE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
     const merged = structuredClone(defaultState);
-    if(parsed.coins != null) merged.coins = parsed.coins;
+    if(parsed.coins!=null) merged.coins = parsed.coins;
     if(parsed.ownedBalls) merged.ownedBalls = parsed.ownedBalls;
     if(parsed.selectedBall) merged.selectedBall = parsed.selectedBall;
-    if(parsed.courses) {
-      parsed.courses.forEach(c => {
-        const target = merged.courses.find(mc => mc.name === c.name);
-        if(target) Object.assign(target, c);
-      });
+    if(parsed.courses){
+      parsed.courses.forEach(c=>{ const t=merged.courses.find(mc=>mc.name===c.name); if(t) Object.assign(t,c); });
     }
     return merged;
-  } catch {
-    return structuredClone(defaultState);
-  }
+  } catch { return structuredClone(defaultState); }
 }
 function resetProgress(){
-  localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(GIFT_KEY);
-  state = structuredClone(defaultState);
-  giftState.lastGift = 0;
-  saveState();
-  saveGiftState();
-  renderMenu();
+  localStorage.removeItem(SAVE_KEY); localStorage.removeItem(GIFT_KEY);
+  state = structuredClone(defaultState); giftState.lastGift = 0;
+  saveState(); saveGiftState(); renderMenu();
 }
-const menuEl = document.getElementById('menu');
-const shopEl = document.getElementById('shop');
-const gameEl = document.getElementById('game');
-const courseListEl = document.getElementById('courseList');
-const bestScoresEl = document.getElementById('bestScores');
-const giftBtn = document.getElementById('giftBtn');
-const giftPopup = document.getElementById('giftPopup');
-const giftPopupMsg = document.getElementById('giftPopupMsg');
-const BALL_STORE = [
-  {id:'white', name:'Classic White', price:0, color:'#ffffff'},
-  {id:'red', name:'Ruby Red', price:25, color:'#ff4d4d'},
-  {id:'blue', name:'Ocean Blue', price:25, color:'#4d8dff'},
-  {id:'yellow', name:'Sun Yellow', price:50, color:'#ffe14d'},
-  {id:'purple', name:'Royal Purple', price:100, color:'#a04dff'},
-  {id:'mint', name:'Mint Green', price:150, color:'#7dffc4'},
-  {id:'teal', name:'Great Teal', price:215, color:'#008080'},
-  {id:'light', name:'Exotic Blue', price:300, color:'#40E0D0'},
-  {id:'pumpkin',name:'Pumpkin Ball', price:75, color:'#FF7518'},
-  {id:'thanks', name:'Thanksgiving Ball', price: 75, color:'#85503a'},
+const menuEl=document.getElementById('menu'),shopEl=document.getElementById('shop'),gameEl=document.getElementById('game');
+const courseListEl=document.getElementById('courseList');
+const giftBtn=document.getElementById('giftBtn'),giftPopup=document.getElementById('giftPopup'),giftPopupMsg=document.getElementById('giftPopupMsg');
+const BALL_STORE=[
+  {id:'white',name:'Classic White',price:0,color:'#ffffff'},
+  {id:'red',name:'Ruby Red',price:25,color:'#ff4d4d'},
+  {id:'blue',name:'Ocean Blue',price:25,color:'#4d8dff'},
+  {id:'yellow',name:'Sun Yellow',price:50,color:'#ffe14d'},
+  {id:'purple',name:'Royal Purple',price:100,color:'#a04dff'},
+  {id:'mint',name:'Mint Green',price:150,color:'#7dffc4'},
+  {id:'teal',name:'Great Teal',price:215,color:'#008080'},
+  {id:'light',name:'Exotic Blue',price:300,color:'#40E0D0'},
+  {id:'pumpkin',name:'Pumpkin Ball',price:75,color:'#FF7518'},
+  {id:'thanks',name:'Thanksgiving Ball',price:75,color:'#85503a'},
 ];
-function show(el){ el.style.display='block'; }
-function hide(el){ el.style.display='none'; }
-function scoreToString(s){ if(s===0) return 'E'; return s>0?`+${s}`:`${s}`; }
-let currentSort = 'all';
-const ORDER_ALL = [0,1,2,3,4,5,6,7,8];
-const ORDER_LEVEL = [0,1,2,3,4,5,6];
-const ORDER_HOLIDAY = [7,8];
+function show(el){el.style.display='block';} function hide(el){el.style.display='none';}
+function scoreToString(s){return s===0?'E':s>0?`+${s}`:`${s}`;}
+let currentSort='all';
+const ORDER_ALL=[0,1,2,3,4,5,6,7,8],ORDER_LEVEL=[0,1,2,3,4,5,6],ORDER_HOLIDAY=[7,8];
 function renderMenu(){
   hide(shopEl); hide(gameEl); show(menuEl);
-  document.getElementById('menuCoins').textContent = state.coins;
+  document.getElementById('menuCoins').textContent=state.coins;
   courseListEl.innerHTML='';
-  let order = ORDER_ALL;
-  if(currentSort==='level') order = ORDER_LEVEL;
-  else if(currentSort==='holiday') order = ORDER_HOLIDAY;
+  let order=currentSort==='level'?ORDER_LEVEL:currentSort==='holiday'?ORDER_HOLIDAY:ORDER_ALL;
   order.forEach(i=>{
-    const c = state.courses[i];
-    if(!c) return;
+    const c=state.courses[i];
     const btn=document.createElement('button');
-    const par = COURSE_PAR[i];
-    const best = c.best==null? 'N/A' : scoreToString(c.best);
-    let displayName = c.name;
-    if(i===8) displayName += ' (NEW)';
-    btn.textContent = `${displayName} (Par ${par}) — Best: ${best}` + (c.unlocked?'':' 🔒');
+    const par=COURSE_PAR[i];
+    const best=c.best==null?'N/A':scoreToString(c.best);
+    let name=c.name; if(i===8) name+=' (NEW)';
+    btn.textContent=`${name} (Par ${par}) — Best: ${best}`+(c.unlocked?'':' Locked');
     btn.disabled=!c.unlocked; btn.onclick=()=>startCourse(i);
     courseListEl.appendChild(btn);
   });
-  bestScoresEl.innerHTML = state.courses.map((c,i)=>`${c.name}: Par ${COURSE_PAR[i]} • Best: ${c.best==null? 'N/A' : scoreToString(c.best)}`).join('<br>');
   updateGiftButton();
 }
-document.getElementById('sortSelect').addEventListener('change', e=>{
-  currentSort = e.target.value;
-  renderMenu();
-});
-function openShop(){ hide(menuEl); show(shopEl); renderShop(); }
-function backToMenu(){ renderMenu(); }
+document.getElementById('sortSelect').addEventListener('change',e=>{currentSort=e.target.value;renderMenu();});
+function openShop(){hide(menuEl);show(shopEl);renderShop();}
+function backToMenu(){renderMenu();}
 function renderShop(){
-  document.getElementById('coins').textContent = state.coins;
-  const wrap=document.getElementById('shopItems');
-  wrap.innerHTML='';
+  document.getElementById('coins').textContent=state.coins;
+  const w=document.getElementById('shopItems'); w.innerHTML='';
   BALL_STORE.forEach(item=>{
     const row=document.createElement('div'); row.className='shop-item';
-    const left=document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='10px';
+    const left=document.createElement('div'); left.style.cssText='display:flex;align-items:center;gap:10px';
     const sw=document.createElement('div'); sw.className='ball-swatch'; sw.style.background=item.color; left.appendChild(sw);
     const meta=document.createElement('div'); meta.innerHTML=`<div><strong>${item.name}</strong></div><div class="tiny">Price: ${item.price} coins</div>`; left.appendChild(meta);
     const right=document.createElement('div');
-    const owned = !!state.ownedBalls[item.id];
+    const owned=!!state.ownedBalls[item.id];
     const btn=document.createElement('button');
-    if(owned){ btn.textContent = state.selectedBall===item.id? 'Selected' : 'Select'; if(state.selectedBall===item.id) btn.disabled=true; btn.onclick=()=>{state.selectedBall=item.id; saveState(); renderShop();}}
-    else{ btn.textContent=`Buy (${item.price})`; btn.disabled = state.coins < item.price; btn.onclick=()=>{ if(state.coins>=item.price){ state.coins-=item.price; state.ownedBalls[item.id]=true; state.selectedBall=item.id; saveState(); renderShop();}}}
-    right.appendChild(btn);
-    row.appendChild(left); row.appendChild(right); wrap.appendChild(row);
+    if(owned){
+      btn.textContent=state.selectedBall===item.id?'Selected':'Select';
+      if(state.selectedBall===item.id) btn.disabled=true;
+      btn.onclick=()=>{state.selectedBall=item.id;saveState();renderShop();}
+    }else{
+      btn.textContent=`Buy (${item.price})`;
+      btn.disabled=state.coins<item.price;
+      btn.onclick=()=>{if(state.coins>=item.price){state.coins-=item.price;state.ownedBalls[item.id]=true;state.selectedBall=item.id;saveState();renderShop();}}
+    }
+    right.appendChild(btn); row.appendChild(left); row.appendChild(right); w.appendChild(row);
   });
 }
-const GIFT_COOLDOWN = 3*60*60*1000;
-function getGiftCooldownMs() {
-  const now = Date.now();
-  return Math.max(0, (giftState.lastGift||0) + GIFT_COOLDOWN - now);
-}
-function msToTime(ms) {
-  let t = Math.ceil(ms/1000);
-  let h = Math.floor(t/3600);
-  let m = Math.floor((t%3600)/60);
-  let s = t%60;
-  let pad = (num) => ("0"+num).slice(-2);
+const GIFT_COOLDOWN=3*60*60*1000;
+function getGiftCooldownMs(){return Math.max(0,(giftState.lastGift||0)+GIFT_COOLDOWN-Date.now());}
+function msToTime(ms){
+  let t=Math.ceil(ms/1000),h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=t%60;
+  let pad=n=>("0"+n).slice(-2);
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
-function updateGiftButton() {
-  const cd = getGiftCooldownMs();
-  if(cd === 0) {
-    giftBtn.disabled = false;
-    giftBtn.textContent = "Gift🎁(Get Coins!)";
-  } else {
-    giftBtn.disabled = false;
-    giftBtn.textContent = `Gift🎁(Not Ready Yet)`;
-  }
+function updateGiftButton(){
+  const cd=getGiftCooldownMs();
+  giftBtn.disabled=false;
+  giftBtn.textContent=cd===0?"Gift (Get Coins!)":"Gift (Not Ready Yet)";
 }
-giftBtn.onclick = function() {
-  const cd = getGiftCooldownMs();
-  if(cd === 0) {
-    const amt = Math.floor(5 + Math.random()*16);
-    state.coins += amt;
-    giftState.lastGift = Date.now();
-    saveState();
-    saveGiftState();
-    renderMenu();
+giftBtn.onclick=function(){
+  const cd=getGiftCooldownMs();
+  if(cd===0){
+    const amt=Math.floor(5+Math.random()*16);
+    state.coins+=amt; giftState.lastGift=Date.now(); saveState(); saveGiftState(); renderMenu();
     showGiftPopup(`<div style="font-size:22px;">You got <span style="color:#ef9b13">${amt}</span> coins!</div>`);
-  } else {
-    showGiftPopup(`<div style="font-size:20px;">⏳You still need to wait <span style="color:#a06319">${msToTime(cd)}</span> for gift to be ready!</div>`);
+  }else{
+    showGiftPopup(`<div style="font-size:20px;">Wait <span style="color:#a06319">${msToTime(cd)}</span> more!</div>`);
   }
 };
-function showGiftPopup(msg) {
-  giftPopupMsg.innerHTML = msg + `<div class="tiny" style="margin-top:14px;">(Tap anywhere to close)</div>`;
-  giftPopup.style.display = "flex";
-  setTimeout(()=>{
-    giftPopup.onclick = closeGiftPopup;
-    giftPopup.ontouchend = closeGiftPopup;
-    document.body.addEventListener('keydown', giftPopupEscHandler);
-  },20);
+function showGiftPopup(msg){
+  giftPopupMsg.innerHTML=msg+`<div class="tiny" style="margin-top:14px;">(Tap anywhere to close)</div>`;
+  giftPopup.style.display="flex";
+  setTimeout(()=>{giftPopup.onclick=giftPopup.ontouchend=closeGiftPopup;document.body.addEventListener('keydown',giftPopupEscHandler);},20);
 }
-function closeGiftPopup() {
-  giftPopup.style.display = "none";
-  giftPopup.onclick = null;
-  giftPopup.ontouchend = null;
-  document.body.removeEventListener('keydown', giftPopupEscHandler);
-}
-function giftPopupEscHandler(e) {
-  if(e.key === "Escape") closeGiftPopup();
-}
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const hudHole = document.getElementById('hudHole');
-const hudStrokes = document.getElementById('hudStrokes');
-const hudScore = document.getElementById('hudScore');
-const hudPar = document.getElementById('hudPar');
-const hudCoins = document.getElementById('hudCoins');
-const clubBtn = document.getElementById('clubBtn');
-const summaryEl = document.getElementById('summary');
-const summaryBody = document.getElementById('summaryBody');
-const COIN_VALUE = 5;
-const MAX_PULL = 220;
-const STOP_SPEED = 0.10;
-const DRIVER_MAX_SPEED = 7.5;
-const PUTTER_MAX_SPEED =4.5
-let currentCourseIdx=0, holeIdx=0;
-let strokes=0, totalScore=0;
-let currentPar=3;
-let club='driver';
-let holeTransition=false;
+function closeGiftPopup(){giftPopup.style.display="none";giftPopup.onclick=giftPopup.ontouchend=null;document.body.removeEventListener('keydown',giftPopupEscHandler);}
+function giftPopupEscHandler(e){if(e.key==="Escape")closeGiftPopup();}
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
+const hudHole=document.getElementById('hudHole'),hudStrokes=document.getElementById('hudStrokes'),hudScore=document.getElementById('hudScore');
+const hudPar=document.getElementById('hudPar'),hudCoins=document.getElementById('hudCoins'),clubBtn=document.getElementById('clubBtn');
+const summaryEl=document.getElementById('summary'),summaryBody=document.getElementById('summaryBody');
+const COIN_VALUE=5,MAX_PULL=220,STOP_SPEED=0.10,DRIVER_MAX_SPEED=7.5,PUTTER_MAX_SPEED=4.5;
+let currentCourseIdx=0,holeIdx=0,strokes=0,totalScore=0,currentPar=3,club='driver',holeTransition=false;
 const ball={x:195,y:540,vx:0,vy:0,r:9};
-let dragging=false, dragX=0, dragY=0, aimDX=0, aimDY=0, powerPct=0;
-let prevX=ball.x, prevY=ball.y;
-let obstacles=[];
-let coinsOnHole=[];
-let cup={x:195,y:70,r:12};
-let startPos={x:195,y:540};
-clubBtn.onclick = ()=>{ club = (club==='driver'?'putter':'driver'); clubBtn.textContent = 'Club: ' + (club==='driver'?'Driver':'Putter'); };
-function exitGame(){ hide(gameEl); renderMenu(); }
+let dragging=false,dragX=0,dragY=0,aimDX=0,aimDY=0,powerPct=0,prevX=ball.x,prevY=ball.y;
+let obstacles=[],coinsOnHole=[],cup={x:195,y:70,r:12},startPos={x:195,y:540};
+clubBtn.onclick=()=>{club=club==='driver'?'putter':'driver';clubBtn.textContent='Club: '+(club==='driver'?'Driver':'Putter');};
+function exitGame(){hide(gameEl);renderMenu();}
 function startCourse(idx){
-  currentCourseIdx=idx; holeIdx=0; strokes=0; totalScore=0; club='driver'; clubBtn.textContent='Club: Driver'; holeTransition=false;
-  hide(menuEl); hide(shopEl); show(gameEl);
-  setupHoleFromPreset();
-  requestAnimationFrame(loop);
+  currentCourseIdx=idx;holeIdx=0;strokes=0;totalScore=0;club='driver';clubBtn.textContent='Club: Driver';holeTransition=false;
+  hide(menuEl);hide(shopEl);show(gameEl);setupHoleFromPreset();requestAnimationFrame(loop);
 }
-function nextHole(){
-  if(holeIdx===8){ return endCourse(); }
-  holeIdx++; holeTransition=false; setupHoleFromPreset();
-}
+function nextHole(){if(holeIdx===8)return endCourse();holeIdx++;holeTransition=false;setupHoleFromPreset();}
 function endCourse(){
   const course=state.courses[currentCourseIdx];
-  if(course.best==null || totalScore < course.best){ course.best = totalScore; }
-  const par = COURSE_PAR[currentCourseIdx];
-  const resultOK = totalScore <= 0;
-  if(resultOK && state.courses[currentCourseIdx+1]){ state.courses[currentCourseIdx+1].unlocked = true; }
-  saveState();
-  show(summaryEl);
-  summaryBody.innerHTML = `Course: <strong>${course.name}</strong><br>`+
-    `Total Par: <strong>${par}</strong><br>`+
-    `Your total vs par: <strong>${scoreToString(totalScore)}</strong><br>`+
-    `${resultOK? 'Nice! Next course unlocked.' : 'Finish E or better to unlock the next course.'}`;
+  if(course.best==null||totalScore<course.best)course.best=totalScore;
+  const par=COURSE_PAR[currentCourseIdx];
+  const resultOK=totalScore<=0;
+  if(resultOK&&state.courses[currentCourseIdx+1])state.courses[currentCourseIdx+1].unlocked=true;
+  saveState();show(summaryEl);
+  summaryBody.innerHTML=`Course: <strong>${course.name}</strong><br>Total Par: <strong>${par}</strong><br>Your total vs par: <strong>${scoreToString(totalScore)}</strong><br>`+
+    `${resultOK?'Nice! Next course unlocked.':'Finish E or better to unlock next.'}`;
 }
-function summaryToMenu(){ hide(summaryEl); exitGame(); }
+function summaryToMenu(){hide(summaryEl);exitGame();}
 function setupHoleFromPreset(){
-  const preset = COURSES[currentCourseIdx][holeIdx];
-  startPos = {x:preset.start.x, y:preset.start.y};
-  ball.x=startPos.x; ball.y=startPos.y; ball.vx=0; ball.vy=0; prevX=ball.x; prevY=ball.y; dragging=false; powerPct=0;
-  cup = {x:preset.cup.x, y:preset.cup.y, r:12};
-  currentPar = preset.par;
-  obstacles = preset.obstacles.map(o=>({...o}));
-  spawnCoins();
-  updateHUD();
+  const p=COURSES[currentCourseIdx][holeIdx];
+  startPos={x:p.start.x,y:p.start.y};ball.x=startPos.x;ball.y=startPos.y;ball.vx=0;ball.vy=0;prevX=ball.x;prevY=ball.y;dragging=false;powerPct=0;
+  cup={x:p.cup.x,y:p.cup.y,r:12};currentPar=p.par;obstacles=p.obstacles.map(o=>({...o}));spawnCoins();updateHUD();
 }
-function spawnCoins(){
-  coinsOnHole=[]; const r=Math.random();
-  if(r<0.25){ coinsOnHole.push(randCoin()); }
-  else if(r<0.35){ coinsOnHole.push(randCoin(), randCoin()); }
-}
-function randCoin(){ return { x: 24+Math.random()*(canvas.width-48), y: 120+Math.random()*(canvas.height-180), r:6 }; }
+function spawnCoins(){coinsOnHole=[];const r=Math.random();if(r<0.25)coinsOnHole.push(randCoin());else if(r<0.35)coinsOnHole.push(randCoin(),randCoin());}
+function randCoin(){return{x:24+Math.random()*(canvas.width-48),y:120+Math.random()*(canvas.height-180),r:6};}
 function updateHUD(){
-  hudHole.textContent = `Hole ${holeIdx+1}/9`;
-  hudStrokes.textContent = `Strokes: ${strokes}`;
-  hudScore.textContent = `Score: ${scoreToString(totalScore)}`;
-  hudPar.textContent = `Par ${currentPar}`;
-  hudCoins.textContent = state.coins;
+  hudHole.textContent=`Hole ${holeIdx+1}/9`;hudStrokes.textContent=`Strokes: ${strokes}`;
+  hudScore.textContent=`Score: ${scoreToString(totalScore)}`;hudPar.textContent=`Par ${currentPar}`;hudCoins.textContent=state.coins;
 }
-function loop(){ update(); draw(); requestAnimationFrame(loop); }
+function loop(){update();draw();requestAnimationFrame(loop);}
 function update(){
-  prevX=ball.x; prevY=ball.y;
-  ball.x += ball.vx; ball.y += ball.vy;
-  ball.vx *= 0.985; ball.vy *= 0.985;
-  if(Math.hypot(ball.vx,ball.vy) < STOP_SPEED){ ball.vx=0; ball.vy=0; }
-  if(ball.x < ball.r){ ball.x=ball.r; ball.vx*=-0.7; }
-  if(ball.x > canvas.width-ball.r){ ball.x=canvas.width-ball.r; ball.vx*=-0.7; }
-  if(ball.y < ball.r){ ball.y=ball.r; ball.vy*=-0.7; }
-  if(ball.y > canvas.height-ball.r){ ball.y=canvas.height-ball.r; ball.vy*=-0.7; }
+  prevX=ball.x;prevY=ball.y;ball.x+=ball.vx;ball.y+=ball.vy;
+  ball.vx*=0.985;ball.vy*=0.985;
+  if(Math.hypot(ball.vx,ball.vy)<STOP_SPEED){ball.vx=0;ball.vy=0;}
+  if(ball.x<ball.r){ball.x=ball.r;ball.vx*=-0.7;}
+  if(ball.x>canvas.width-ball.r){ball.x=canvas.width-ball.r;ball.vx*=-0.7;}
+  if(ball.y<ball.r){ball.y=ball.r;ball.vy*=-0.7;}
+  if(ball.y>canvas.height-ball.r){ball.y=canvas.height-ball.r;ball.vy*=-0.7;}
   obstacles.forEach(o=>{
-    const inside = ball.x>o.x-ball.r && ball.x<o.x+o.w+ball.r && ball.y>o.y-ball.r && ball.y<o.y+o.h+ball.r;
-    const wasInside = prevX>o.x-ball.r && prevX<o.x+o.w+ball.r && prevY>o.y-ball.r && prevY<o.y+o.h+ball.r;
+    const inside=ball.x>o.x-ball.r&&ball.x<o.x+o.w+ball.r&&ball.y>o.y-ball.r&&ball.y<o.y+o.h+ball.r;
+    const wasInside=prevX>o.x-ball.r&&prevX<o.x+o.w+ball.r&&prevY>o.y-ball.r&&prevY<o.y+o.h+ball.r;
     if(inside){
-      if(o.type==='sand'){
-        ball.vx *= 0.5; ball.vy *= 0.5;
-      } else if(!wasInside){
-        const penX = Math.min(Math.abs((o.x-ball.x)+ball.r), Math.abs((o.x+o.w-ball.x)-ball.r));
-        const penY = Math.min(Math.abs((o.y-ball.y)+ball.r), Math.abs((o.y+o.h-ball.y)-ball.r));
-        if(penX < penY){ ball.vx *= (o.type==='green'?-0.6:-0.35); }
-        else{ ball.vy *= (o.type==='green'?-0.6:-0.35); }
+      if(o.type==='sand'){ball.vx*=0.5;ball.vy*=0.5;}
+      else if(!wasInside){
+        const penX=Math.min(Math.abs(o.x-ball.x+ball.r),Math.abs(o.x+o.w-ball.x-ball.r));
+        const penY=Math.min(Math.abs(o.y-ball.y+ball.r),Math.abs(o.y+o.h-ball.y-ball.r));
+        if(penX<penY)ball.vx*=(o.type==='green'?-0.6:-0.35);
+        else ball.vy*=(o.type==='green'?-0.6:-0.35);
       }
     }
   });
   for(let i=coinsOnHole.length-1;i>=0;i--){
     const c=coinsOnHole[i];
-    const d2=(ball.x-c.x)*(ball.x-c.x)+(ball.y-c.y)*(ball.y-c.y);
-    if(d2 < (ball.r+c.r)*(ball.r+c.r)){
-      coinsOnHole.splice(i,1);
-      state.coins += COIN_VALUE; saveState(); updateHUD();
+    if((ball.x-c.x)**2+(ball.y-c.y)**2<(ball.r+c.r)**2){
+      coinsOnHole.splice(i,1);state.coins+=COIN_VALUE;saveState();updateHUD();
     }
   }
   if(!holeTransition){
-    const d2=(ball.x-cup.x)*(ball.x-cup.x)+(ball.y-cup.y)*(ball.y-cup.y);
-    if(d2 < cup.r*cup.r && Math.hypot(ball.vx,ball.vy) < 1.0){
-      holeTransition=true;
-      totalScore += (strokes - currentPar);
-      strokes = 0; updateHUD();
-      setTimeout(()=>{ nextHole(); }, 400);
+    const d2=(ball.x-cup.x)**2+(ball.y-cup.y)**2;
+    if(d2<cup.r**2&&Math.hypot(ball.vx,ball.vy)<1.0){
+      holeTransition=true;totalScore+=strokes-currentPar;strokes=0;updateHUD();
+      setTimeout(()=>{nextHole();},400);
     }
   }
 }
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(currentCourseIdx === 7){
-    ctx.fillStyle = '#5a3d2b';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    for(let i=0;i<8;i++){
-      ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
-      ctx.fillRect(0,i*80,canvas.width,40);
-    }
-  } else if(currentCourseIdx === 8){
-    ctx.fillStyle = '#ffb86b';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    for(let i=0;i<8;i++){
-      ctx.fillStyle = `rgba(0,0,0,${0.02*(i%2)})`;
-      ctx.fillRect(0,i*80,canvas.width,40);
-    }
-  } else {
-    for(let i=0;i<8;i++){ ctx.fillStyle = `rgba(255,255,255,${0.03*(i%2)})`; ctx.fillRect(0,i*80,canvas.width,40); }
+  if(currentCourseIdx===7){
+    ctx.fillStyle='#5a3d2b';ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<8;i++){ctx.fillStyle=`rgba(0,0,0,${0.02*(i%2)})`;ctx.fillRect(0,i*80,canvas.width,40);}
+  }else if(currentCourseIdx===8){
+    ctx.fillStyle='#ffb86b';ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<8;i++){ctx.fillStyle=`rgba(0,0,0,${0.02*(i%2)})`;ctx.fillRect(0,i*80,canvas.width,40);}
+  }else{
+    for(let i=0;i<8;i++){ctx.fillStyle=`rgba(255,255,255,${0.03*(i%2)})`;ctx.fillRect(0,i*80,canvas.width,40);}
   }
   obstacles.forEach(o=>{
     if(o.type==='sand'){
-      const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
-      grd.addColorStop(0,'#f7e8b6'); grd.addColorStop(1,'#e0cd8e');
-      ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
-      ctx.strokeStyle='rgba(0,0,0,.15)'; ctx.stroke();
+      const g=ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);g.addColorStop(0,'#f7e8b6');g.addColorStop(1,'#e0cd8e');
+      ctx.fillStyle=g;roundRect(o.x,o.y,o.w,o.h,10,true,false);ctx.strokeStyle='rgba(0,0,0,.15)';ctx.stroke();
     }else if(o.type==='green'){
-      const grd = ctx.createLinearGradient(o.x,o.y,o.x+o.w,o.y);
-      grd.addColorStop(0,'#77e382'); grd.addColorStop(1,'#34c759');
-      ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
+      const g=ctx.createLinearGradient(o.x,o.y,o.x+o.w,o.y);g.addColorStop(0,'#77e382');g.addColorStop(1,'#34c759');
+      ctx.fillStyle=g;roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }else if(o.type==='grave'){
-      const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
-      grd.addColorStop(0,'#bdbdbd'); grd.addColorStop(1,'#8a8a8a');
-      ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,8,true,false);
-      ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='rgba(0,0,0,0.12)';
-      const cx = o.x + o.w/2;
-      const cy = o.y + o.h/2 - 4;
-      ctx.fillRect(cx-1, cy-8, 2, 14);
-      ctx.fillRect(cx-6, cy-1, 12, 2);
+      const g=ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);g.addColorStop(0,'#bdbdbd');g.addColorStop(1,'#8a8a8a');
+      ctx.fillStyle=g;roundRect(o.x,o.y,o.w,o.h,8,true,false);ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='rgba(0,0,0,0.12)';const cx=o.x+o.w/2,cy=o.y+o.h/2-4;
+      ctx.fillRect(cx-1,cy-8,2,14);ctx.fillRect(cx-6,cy-1,12,2);
     }else{
-      const grd = ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);
-      grd.addColorStop(0,'#a77746'); grd.addColorStop(1, '#7d5a34');
-      ctx.fillStyle = grd; roundRect(o.x,o.y,o.w,o.h,10,true,false);
+      const g=ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);g.addColorStop(0,'#a77746');g.addColorStop(1,'#7d5a34');
+      ctx.fillStyle=g;roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }
   });
   coinsOnHole.forEach(c=>{
-    const grd=ctx.createRadialGradient(c.x-2,c.y-2,2,c.x,c.y,10);
-    grd.addColorStop(0,'#fff8a8'); grd.addColorStop(1,'#e7b100');
-    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.stroke();
+    const g=ctx.createRadialGradient(c.x-2,c.y-2,2,c.x,c.y,10);g.addColorStop(0,'#fff8a8');g.addColorStop(1,'#e7b100');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.stroke();
   });
-  ctx.beginPath(); ctx.arc(cup.x,cup.y,cup.r,0,Math.PI*2); ctx.fillStyle='#0b1110'; ctx.fill();
-  ctx.beginPath(); ctx.arc(cup.x,cup.y,cup.r+4,0,Math.PI*2); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=3; ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cup.x, cup.y-cup.r-18); ctx.lineTo(cup.x, cup.y); ctx.strokeStyle='#1b1b1b'; ctx.lineWidth=3; ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cup.x, cup.y-cup.r-18); ctx.lineTo(cup.x+18, cup.y-cup.r-12); ctx.lineTo(cup.x, cup.y-cup.r-6); ctx.closePath(); ctx.fillStyle='#ffd34d'; ctx.fill();
-  const sel = BALL_STORE.find(b=>b.id===state.selectedBall) || BALL_STORE[0];
-  const bgrd = ctx.createRadialGradient(ball.x-3,ball.y-3,2,ball.x,ball.y,ball.r);
-  bgrd.addColorStop(0,'#ffffff'); bgrd.addColorStop(1, sel.color);
-  ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fillStyle=bgrd; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath();ctx.arc(cup.x,cup.y,cup.r,0,Math.PI*2);ctx.fillStyle='#0b1110';ctx.fill();
+  ctx.beginPath();ctx.arc(cup.x,cup.y,cup.r+4,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cup.x,cup.y-cup.r-18);ctx.lineTo(cup.x,cup.y);ctx.strokeStyle='#1b1b1b';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cup.x,cup.y-cup.r-18);ctx.lineTo(cup.x+18,cup.y-cup.r-12);ctx.lineTo(cup.x,cup.y-cup.r-6);ctx.closePath();ctx.fillStyle='#ffd34d';ctx.fill();
+  const sel=BALL_STORE.find(b=>b.id===state.selectedBall)||BALL_STORE[0];
+  const bg=ctx.createRadialGradient(ball.x-3,ball.y-3,2,ball.x,ball.y,ball.r);
+  bg.addColorStop(0,'#ffffff');bg.addColorStop(1,sel.color);
+  ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=2;ctx.stroke();
   if(dragging){
-    ctx.beginPath(); ctx.moveTo(ball.x,ball.y); ctx.lineTo(dragX,dragY); ctx.lineWidth=3; ctx.setLineDash([8,6]); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke(); ctx.setLineDash([]);
-    ctx.font='bold 16px system-ui, -apple-system, Segoe UI'; ctx.textAlign='center'; ctx.textBaseline='bottom';
-    ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(ball.x-30,ball.y-36,60,20);
-    ctx.fillStyle='#eafff2'; ctx.fillText(`${Math.round(powerPct*100)}%`, ball.x, ball.y-20);
+    ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(dragX,dragY);ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.strokeStyle='rgba(255,255,255,.9)';ctx.stroke();ctx.setLineDash([]);
+    ctx.font='bold 16px system-ui,-apple-system,Segoe UI';ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(ball.x-30,ball.y-36,60,20);
+    ctx.fillStyle='#eafff2';ctx.fillText(`${Math.round(powerPct*100)}%`,ball.x,ball.y-20);
   }
 }
-function roundRect(x,y,w,h,r,fill,stroke){
-  if(w<2*r) r=w/2; if(h<2*r) r=h/2; ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); if(fill) ctx.fill(); if(stroke) ctx.stroke();
+function roundRect(x,y,w,h,r,f,s){
+  if(w<2*r)r=w/2;if(h<2*r)r=h/2;ctx.beginPath();ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+  if(f)ctx.fill();if(s)ctx.stroke();
 }
-function getCanvasPoint(clientX,clientY){ const r=canvas.getBoundingClientRect(); const x=(clientX-r.left)*(canvas.width/r.width); const y=(clientY-r.top)*(canvas.height/r.height); return {x,y}; }
-function canShoot(){ return Math.hypot(ball.vx,ball.vy)<0.1 && !holeTransition; }
-function startDrag(x,y){ if(Math.hypot(x-ball.x,y-ball.y)<=26 && canShoot()){ dragging=true; dragX=x; dragY=y; calcAim(); } }
-function moveDrag(x,y){ if(!dragging) return; dragX=x; dragY=y; calcAim(); }
-function endDrag(){ if(!dragging) return; dragging=false; const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL); const ang=Math.atan2(aimDY,aimDX);
-  const minPct = (club==='driver'?0.25:0.01); const maxPct=(club==='driver'?1.0:0.60);
-  let pct = powerPct; if(pct<minPct) pct=minPct; if(pct>maxPct) pct=maxPct;
-  const MAX_SPEED = (club==='driver'? DRIVER_MAX_SPEED : PUTTER_MAX_SPEED);
-  const speed = pct * MAX_SPEED;
-  ball.vx = -Math.cos(ang)*speed; ball.vy = -Math.sin(ang)*speed; strokes++; updateHUD(); }
-function calcAim(){ aimDX=dragX-ball.x; aimDY=dragY-ball.y; const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL); powerPct = mag / MAX_PULL; }
-canvas.addEventListener('touchstart',e=>{ const t=e.touches[0]; const p=getCanvasPoint(t.clientX,t.clientY); startDrag(p.x,p.y); },{passive:true});
-canvas.addEventListener('touchmove', e=>{ const t=e.touches[0]; const p=getCanvasPoint(t.clientX,t.clientY); moveDrag(p.x,p.y); },{passive:true});
-canvas.addEventListener('touchend', ()=> endDrag());
-canvas.addEventListener('mousedown', e=>{ const p=getCanvasPoint(e.clientX,e.clientY); startDrag(p.x,p.y); });
-window.addEventListener('mousemove', e=>{ const p=getCanvasPoint(e.clientX,e.clientY); moveDrag(p.x,p.y); });
-window.addEventListener('mouseup', ()=> endDrag());
-function init(){ renderMenu(); }
+function getCanvasPoint(x,y){
+  const r=canvas.getBoundingClientRect();
+  return{x:(x-r.left)*(canvas.width/r.width),y:(y-r.top)*(canvas.height/r.height)};
+}
+function canShoot(){return Math.hypot(ball.vx,ball.vy)<0.1&&!holeTransition;}
+function startDrag(x,y){if(Math.hypot(x-ball.x,y-ball.y)<=26&&canShoot()){dragging=true;dragX=x;dragY=y;calcAim();}}
+function moveDrag(x,y){if(!dragging)return;dragX=x;dragY=y;calcAim();}
+function endDrag(){
+  if(!dragging)return;dragging=false;
+  const mag=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL);
+  const ang=Math.atan2(aimDY,aimDX);
+  const minPct=club==='driver'?0.25:0.01,maxPct=club==='driver'?1.0:0.60;
+  let pct=powerPct;if(pct<minPct)pct=minPct;if(pct>maxPct)pct=maxPct;
+  const speed=pct*(club==='driver'?DRIVER_MAX_SPEED:PUTTER_MAX_SPEED);
+  ball.vx=-Math.cos(ang)*speed;ball.vy=-Math.sin(ang)*speed;strokes++;updateHUD();
+}
+function calcAim(){aimDX=dragX-ball.x;aimDY=dragY-ball.y;powerPct=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL)/MAX_PULL;}
+canvas.addEventListener('touchstart',e=>{const t=e.touches[0];const p=getCanvasPoint(t.clientX,t.clientY);startDrag(p.x,p.y);},{passive:true});
+canvas.addEventListener('touchmove',e=>{const t=e.touches[0];const p=getCanvasPoint(t.clientX,t.clientY);moveDrag(p.x,p.y);},{passive:true});
+canvas.addEventListener('touchend',()=>endDrag());
+canvas.addEventListener('mousedown',e=>{const p=getCanvasPoint(e.clientX,e.clientY);startDrag(p.x,p.y);});
+window.addEventListener('mousemove',e=>{const p=getCanvasPoint(e.clientX,e.clientY);moveDrag(p.x,p.y);});
+window.addEventListener('mouseup',()=>endDrag());
+function init(){renderMenu();}
 init();
 </script>
 </body>
