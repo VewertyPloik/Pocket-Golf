@@ -27,13 +27,19 @@
   .pill{padding:4px 8px;border-radius:999px;background:#eafff2;color:var(--ink);font-size:12px}
   .tiny{font-size:12px;opacity:.8}
   .shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.15);padding:10px;border-radius:12px}
-  .ball-swatch{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.35);box-shadow:inset 0 8px 10px rgba(255,255,255,.35), inset 0 -6px 10px rgba(0,0,0,.35)}
+  .ball-swatch{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.35);box-shadow:inset 0 8px 10px rgba(255,255,255,.35), inset 0 -6px 10px rgba(0,0,0,.35);position:relative}
   .club-toggle{display:flex;gap:8px}
   #summary{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;z-index:10}
   #summary .panel{max-width:420px;width:100%;background:linear-gradient(180deg,#f0fff6,#cfffdf);color:#08371a;border-radius:16px;padding:16px;box-shadow:0 20px 30px var(--shadow)}
   select.sort-select{appearance:none;padding:8px 10px;border-radius:10px;background:#eafff1;border:1px solid rgba(0,0,0,.08);font-weight:800;color:var(--ink)}
   #giftPopup{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:11;cursor:pointer}
   #giftPopup .panel{max-width:340px;width:100%;background:linear-gradient(180deg,#fffbe6,#fbe5bb);color:#6b4a19;border-radius:14px;padding:16px;box-shadow:0 12px 28px var(--shadow);text-align:center;font-size:16px;font-weight:700}
+  .tab-row{display:flex;gap:8px;margin-bottom:12px}
+  .tab-btn{padding:8px 16px;border-radius:10px;background:rgba(255,255,255,.15);font-weight:800;flex:1;text-align:center}
+  .tab-btn.active{background:#eafff2;color:var(--ink)}
+  .earn-item{opacity:0.6}
+  .earn-item.unlocked{opacity:1}
+  .info-btn{margin-left:8px;padding:4px 8px;font-size:12px;background:rgba(255,255,255,.3);border-radius:8px}
 </style>
 </head>
 <body>
@@ -42,11 +48,10 @@
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
         <strong>POCKET GOLF</strong>
-        <span class="">version 1.15</span>
+        <span class="">version 1.16</span>
       </div>
       <div class="row" style="justify-content:space-between;align-items:center">
         <div style="display:flex;gap:8px;align-items:center">
-          <label class="tiny" for="sortSelect"></label>
           <select id="sortSelect" class="sort-select">
             <option value="all">All Courses</option>
             <option value="level">Level Courses</option>
@@ -56,9 +61,6 @@
         <button class="ghost" id="giftBtn">Gift (Get Coins!)</button>
       </div>
       <div id="courseList" class="stack"></div>
-
-      <!-- "Best & Par" box completely removed -->
-
       <div class="row" style="justify-content:space-between;align-items:center;margin-top:12px">
         <div>Coins: <strong id="menuCoins">0</strong></div>
         <div class="row">
@@ -73,8 +75,13 @@
         <strong>Shop</strong>
         <div>Coins: <strong id="coins">0</strong></div>
       </div>
+      <div class="tab-row">
+        <button class="tab-btn active" id="tabBuy">Buy Balls</button>
+        <button class="tab-btn" id="tabEarn">Earn Balls</button>
+      </div>
       <div id="shopItems" class="stack" style="width:100%"></div>
-      <div class="row" style="justify-content:space-between">
+      <div id="earnItems" class="stack" style="width:100%;display:none"></div>
+      <div class="row" style="justify-content:space-between;margin-top:12px">
         <button class="ghost" onclick="backToMenu()">Back</button>
       </div>
     </div>
@@ -115,112 +122,94 @@
   </div>
 
 <script>
-// ======= Preset Courses (9 total) =======
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
-const COURSES = [
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(80,260,230,22,'sand')]},
-    {start:{x:60,y:560}, cup:{x:320,y:110}, par:4, obstacles:[R(140,340,120,20,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:4, obstacles:[R(100,300,190,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(60,360,270,20,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:4, obstacles:[R(150,300,60,18,'green'),R(200,220,80,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,320,160,22,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(80,340,230,18,'green')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(90,280,210,18,'brown')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(40,380,310,24,'sand'),R(60,280,270,20,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,360,230,24,'sand'),R(120,260,160,20,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,240,250,24,'sand'),R(100,320,190,20,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,340,250,24,'sand'),R(150,260,80,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(60,360,270,24,'sand'),R(110,260,170,22,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(70,340,250,22,'sand'),R(130,260,130,20,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
-    {start:{x:60,y:560}, cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(90,320,230,16,'brown'),R(120,240,160,16,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(70,340,250,18,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(140,260,120,16,'brown'),R(160,320,70,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(60,260,270,18,'brown'),R(120,340,150,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,16,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(80,320,230,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(70,340,250,18,'green'),R(120,260,150,18,'green')]},
-    {start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(150,320,80,18,'green'),R(60,260,270,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,320,170,18,'green'),R(120,240,150,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'green')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,360,170,20,'sand'),R(100,280,200,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(60,340,270,18,'green'),R(120,260,150,18,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,360,250,20,'sand'),R(140,280,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,320,230,18,'green'),R(120,240,160,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},
-  ],
-  [
-    {start:{x:300,y:120}, cup:{x:20,y:620}, par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110}, par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,340,230,18,'green'),R(120,280,120,18,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(60,260,270,18,'brown'),R(200,300,80,18,'sand')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,320,230,18,'sand'),R(140,240,120,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:60}, par:4, obstacles:[R(70,340,250,18,'green'),R(200,200,200,60,'sand'),R(10,140,150,60,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280,40,'brown'),R(100,290,360,45,'sand')]},
-    {start:{x:60,y:560}, cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
-    {start:{x:55,y:560}, cup:{x:195,y:50}, par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
-    {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
-    {start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
-    {start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
-    {start:{x:60,y:560}, cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(160,105,70,90,'grave')]},
-    {start:{x:370,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,300,150,18,'grave')]},
-    {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(90,280,210,18,'grave')]},
-    {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(140,260,120,18,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(100,240,190,18,'grave')]},
-    {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'grave')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
-    {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,260,210,18,'grave')]},
-  ],
-  [
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'),R(200,250,500,40,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(90,320,230,18,'brown')]},
-    {start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(150,320,80,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:2, obstacles:[R(110,320,170,18,'brown')]},
-    {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
-    {start:{x:60,y:560}, cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
-    {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown')]},
-  ],
+const COURSES = [ /* ← ALL COURSES UNCHANGED (same as before) */ 
+[{start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(80,260,230,22,'sand')]},
+{start:{x:60,y:560}, cup:{x:320,y:110}, par:4, obstacles:[R(140,340,120,20,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:4, obstacles:[R(100,300,190,18,'brown')]},
+{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(60,360,270,20,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:4, obstacles:[R(150,300,60,18,'green'),R(200,220,80,18,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,320,160,22,'sand')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(80,340,230,18,'green')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,240,270,20,'sand')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(90,280,210,18,'brown')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(40,380,310,24,'sand'),R(60,280,270,20,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(110,340,190,22,'sand'),R(160,220,110,18,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,360,230,24,'sand'),R(120,260,160,20,'sand')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,240,250,24,'sand'),R(100,320,190,20,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,340,250,24,'sand'),R(150,260,80,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(60,360,270,24,'sand'),R(110,260,170,22,'sand')]},
+{start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(70,340,250,22,'sand'),R(130,260,130,20,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
+{start:{x:60,y:560}, cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(90,320,230,16,'brown'),R(120,240,160,16,'brown')]},
+{start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(70,340,250,18,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(140,260,120,16,'brown'),R(160,320,70,16,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(60,260,270,18,'brown'),R(120,340,150,18,'brown')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,16,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(90,360,210,18,'green'),R(140,280,110,18,'green')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'green'),R(140,240,120,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(80,320,230,18,'green')]},
+{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(70,340,250,18,'green'),R(120,260,150,18,'green')]},
+{start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(150,320,80,18,'green'),R(60,260,270,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,320,170,18,'green'),R(120,240,150,18,'green')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'green')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'green'),R(120,260,150,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'green'),R(140,260,120,18,'green')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:90}, par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'green'),R(160,220,70,16,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,360,170,20,'sand'),R(100,280,200,18,'green')]},
+{start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(60,340,270,18,'green'),R(120,260,150,18,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(70,360,250,20,'sand'),R(140,280,120,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(90,320,230,18,'green'),R(120,240,160,18,'brown')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(-20,320,250,18,'green'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},],
+[{start:{x:300,y:120}, cup:{x:20,y:620}, par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
+{start:{x:330,y:560}, cup:{x:60,y:110}, par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
+{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,340,230,18,'green'),R(120,280,120,18,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(60,260,270,18,'brown'),R(200,300,80,18,'sand')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,320,230,18,'sand'),R(140,240,120,18,'green')]},
+{start:{x:195,y:560}, cup:{x:195,y:60}, par:4, obstacles:[R(70,340,250,18,'green'),R(200,200,200,60,'sand'),R(10,140,150,60,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:100}, par:4, obstacles:[R(-10,450,280,40,'brown'),R(100,290,360,45,'sand')]},
+{start:{x:60,y:560}, cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
+{start:{x:55,y:560}, cup:{x:195,y:50}, par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
+{start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
+{start:{x:60,y:560}, cup:{x:330,y:90}, par:3, obstacles:[R(140,260,120,18,'brown'),R(200,200,80,18,'green')]},
+{start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(120,320,150,18,'sand'),R(160,240,120,18,'green')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(70,280,250,18,'green'),R(270,200,200,18,'sand'),R(20,140,120,18,'brown')]},
+{start:{x:60,y:560}, cup:{x:300,y:45}, par:4, obstacles:[R(200,320,240,18,'sand'),R(-20,240,230,18,'green'),R(280,180,230,18,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:100}, par:2, obstacles:[R(80,320,240,18,'sand'),R(150,260,100,18,'green'),R(200,180,100,18,'brown')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(160,105,70,90,'grave')]},
+{start:{x:370,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,220,300,80,'grave'),R(-250,220,300,80,'grave')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(120,300,150,18,'grave')]},
+{start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(90,280,210,18,'grave')]},
+{start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(140,260,120,18,'grave')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(100,240,190,18,'grave')]},
+{start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'grave')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
+{start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,260,210,18,'grave')]},],
+[{start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'),R(200,250,500,40,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:110}, par:2, obstacles:[R(110,340,190,18,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(90,320,230,18,'brown')]},
+{start:{x:50,y:80}, cup:{x:50,y:600}, par:4, obstacles:[R(-100,450,300,40,'brown'),R(100,550,600,150,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(150,320,80,18,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:2, obstacles:[R(110,320,170,18,'brown')]},
+{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
+{start:{x:60,y:560}, cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
+{start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown')]},],
 ];
 const COURSE_PAR = COURSES.map(c=>c.reduce((a,h)=>a+h.par,0));
 const SAVE_KEY = 'pocket_golf_v4';
 const GIFT_KEY = 'pocket_golf_gift_v2';
+
 const defaultState = {
   coins: 0,
   ownedBalls: { white:true },
@@ -237,14 +226,17 @@ const defaultState = {
     {name:'Turkey Journey', unlocked:true, best:null},
   ]
 };
+
 let giftState = { lastGift: 0 };
 function saveGiftState() { localStorage.setItem(GIFT_KEY, JSON.stringify(giftState)); }
 function loadGiftState() {
   try { const p = localStorage.getItem(GIFT_KEY); if(p) giftState = JSON.parse(p); }
   catch { giftState.lastGift = 0; }
 }
+
 let state = loadState();
 loadGiftState();
+
 function saveState(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 function loadState() {
   try {
@@ -260,14 +252,17 @@ function loadState() {
     return merged;
   } catch { return structuredClone(defaultState); }
 }
+
 function resetProgress(){
   localStorage.removeItem(SAVE_KEY); localStorage.removeItem(GIFT_KEY);
   state = structuredClone(defaultState); giftState.lastGift = 0;
   saveState(); saveGiftState(); renderMenu();
 }
+
 const menuEl=document.getElementById('menu'),shopEl=document.getElementById('shop'),gameEl=document.getElementById('game');
 const courseListEl=document.getElementById('courseList');
 const giftBtn=document.getElementById('giftBtn'),giftPopup=document.getElementById('giftPopup'),giftPopupMsg=document.getElementById('giftPopupMsg');
+
 const BALL_STORE=[
   {id:'white',name:'Classic White',price:0,color:'#ffffff'},
   {id:'red',name:'Ruby Red',price:25,color:'#ff4d4d'},
@@ -280,10 +275,23 @@ const BALL_STORE=[
   {id:'pumpkin',name:'Pumpkin Ball',price:75,color:'#FF7518'},
   {id:'thanks',name:'Thanksgiving Ball',price:75,color:'#85503a'},
 ];
+
+// UPDATED EARN BALLS (your new colors)
+const EARN_BALLS = [
+  {id:'forestgreen', name:'Forest Green', color:'#228B22', how:'Complete Meadow Run'},
+  {id:'darkblue',   name:'Dark Blue',    color:'#0051c2', how:'Complete Emerald Slides'},
+  {id:'pink',       name:'Pink',         color:'#FF69B4', how:'Complete any Holiday course'},
+  {id:'purpink',    name:'Magenta',      color:'#FF00FF', how:'Complete any course -5 or better'},           // ← Magenta
+  {id:'redblue',    name:'Lime',        color:'#9dff5c', how:'Complete any course -10 or better'},           // ← Pure Black
+  {id:'smiley',     name:'Smiley Face', color:'#ffffff', smiley:true, how:'Complete 5 different courses'},
+  {id:'limecyan',   name:'Indigo',       color:'#2f0070', how:'Complete all 9 courses'},                     // ← Orange
+];
+
 function show(el){el.style.display='block';} function hide(el){el.style.display='none';}
 function scoreToString(s){return s===0?'E':s>0?`+${s}`:`${s}`;}
 let currentSort='all';
 const ORDER_ALL=[0,1,2,3,4,5,6,7,8],ORDER_LEVEL=[0,1,2,3,4,5,6],ORDER_HOLIDAY=[7,8];
+
 function renderMenu(){
   hide(shopEl); hide(gameEl); show(menuEl);
   document.getElementById('menuCoins').textContent=state.coins;
@@ -294,23 +302,49 @@ function renderMenu(){
     const btn=document.createElement('button');
     const par=COURSE_PAR[i];
     const best=c.best==null?'N/A':scoreToString(c.best);
-    let name=c.name; if(i===8) name+=' (NEW)';
+    let name=c.name; if(i===8) name+='';
     btn.textContent=`${name} (Par ${par}) — Best: ${best}`+(c.unlocked?'':' Locked');
     btn.disabled=!c.unlocked; btn.onclick=()=>startCourse(i);
     courseListEl.appendChild(btn);
   });
   updateGiftButton();
 }
+
 document.getElementById('sortSelect').addEventListener('change',e=>{currentSort=e.target.value;renderMenu();});
-function openShop(){hide(menuEl);show(shopEl);renderShop();}
+
+function openShop(){
+  hide(menuEl);show(shopEl);
+  document.getElementById('tabBuy').classList.add('active');
+  document.getElementById('tabEarn').classList.remove('active');
+  document.getElementById('shopItems').style.display='block';
+  document.getElementById('earnItems').style.display='none';
+  renderShop();
+}
 function backToMenu(){renderMenu();}
+
+document.getElementById('tabBuy').onclick = () => {
+  document.getElementById('tabBuy').classList.add('active');
+  document.getElementById('tabEarn').classList.remove('active');
+  document.getElementById('shopItems').style.display='block';
+  document.getElementById('earnItems').style.display='none';
+  renderShop();
+};
+document.getElementById('tabEarn').onclick = () => {
+  document.getElementById('tabEarn').classList.add('active');
+  document.getElementById('tabBuy').classList.remove('active');
+  document.getElementById('earnItems').style.display='block';
+  document.getElementById('shopItems').style.display='none';
+  renderEarnTab();
+};
+
 function renderShop(){
   document.getElementById('coins').textContent=state.coins;
   const w=document.getElementById('shopItems'); w.innerHTML='';
   BALL_STORE.forEach(item=>{
     const row=document.createElement('div'); row.className='shop-item';
     const left=document.createElement('div'); left.style.cssText='display:flex;align-items:center;gap:10px';
-    const sw=document.createElement('div'); sw.className='ball-swatch'; sw.style.background=item.color; left.appendChild(sw);
+    const sw=document.createElement('div'); sw.className='ball-swatch'; sw.style.background=item.color;
+    left.appendChild(sw);
     const meta=document.createElement('div'); meta.innerHTML=`<div><strong>${item.name}</strong></div><div class="tiny">Price: ${item.price} coins</div>`; left.appendChild(meta);
     const right=document.createElement('div');
     const owned=!!state.ownedBalls[item.id];
@@ -318,15 +352,72 @@ function renderShop(){
     if(owned){
       btn.textContent=state.selectedBall===item.id?'Selected':'Select';
       if(state.selectedBall===item.id) btn.disabled=true;
-      btn.onclick=()=>{state.selectedBall=item.id;saveState();renderShop();}
+      btn.onclick=()=>{state.selectedBall=item.id;saveState();renderShop();};
     }else{
       btn.textContent=`Buy (${item.price})`;
       btn.disabled=state.coins<item.price;
-      btn.onclick=()=>{if(state.coins>=item.price){state.coins-=item.price;state.ownedBalls[item.id]=true;state.selectedBall=item.id;saveState();renderShop();}}
+      btn.onclick=()=>{if(state.coins>=item.price){state.coins-=item.price;state.ownedBalls[item.id]=true;state.selectedBall=item.id;saveState();renderShop();}};
     }
     right.appendChild(btn); row.appendChild(left); row.appendChild(right); w.appendChild(row);
   });
 }
+
+function renderEarnTab(){
+  const container = document.getElementById('earnItems'); container.innerHTML='';
+  EARN_BALLS.forEach(ball=>{
+    const unlocked = isEarnBallUnlocked(ball.id);
+    if(unlocked && !state.ownedBalls[ball.id]){
+      state.ownedBalls[ball.id] = true;
+      if(!state.selectedBall || state.selectedBall==='white') state.selectedBall = ball.id;
+      saveState();
+    }
+    const row = document.createElement('div');
+    row.className = 'shop-item earn-item' + (unlocked?' unlocked':'');
+    const left = document.createElement('div'); left.style.cssText='display:flex;align-items:center;gap:10px';
+    const sw = document.createElement('div'); sw.className='ball-swatch';
+    sw.style.background = ball.color;
+    if(ball.smiley && unlocked){
+      sw.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px">:)</div>';
+    }
+    left.appendChild(sw);
+    const meta = document.createElement('div');
+    meta.innerHTML = `<strong>${ball.name}</strong><div class="tiny">${unlocked?'Unlocked!':'Locked'}</div>`;
+    left.appendChild(meta);
+    const right = document.createElement('div'); right.style.display='flex'; right.style.gap='6px'; right.style.alignItems='center';
+    if(unlocked){
+      const btn = document.createElement('button');
+      btn.textContent = state.selectedBall===ball.id?'Selected':'Select';
+      if(state.selectedBall===ball.id) btn.disabled=true;
+      btn.onclick=()=>{state.selectedBall=ball.id;saveState();renderEarnTab();};
+      right.appendChild(btn);
+    }
+    const info = document.createElement('button');
+    info.className='info-btn';
+    info.textContent='i';
+    info.onclick=()=>alert(ball.how);
+    right.appendChild(info);
+    row.appendChild(left); row.appendChild(right); container.appendChild(row);
+  });
+}
+
+function isEarnBallUnlocked(id){
+  const bests = state.courses.map(c=>c.best??999);
+  const completed = bests.filter(s=>s!==999).length;
+  const anyHoliday = state.courses[7].best!==null || state.courses[8].best!==null;
+  const hasMinus5 = bests.some(s=>s<=-5);
+  const hasMinus10 = bests.some(s=>s<=-10);
+  switch(id){
+    case 'forestgreen': return state.courses[0].best!==null;
+    case 'darkblue':   return state.courses[3].best!==null;
+    case 'pink':       return anyHoliday;
+    case 'purpink':    return hasMinus5;
+    case 'redblue':    return hasMinus10;
+    case 'smiley':     return completed>=5;
+    case 'limecyan':   return completed>=9;
+    default: return false;
+  }
+}
+
 const GIFT_COOLDOWN=3*60*60*1000;
 function getGiftCooldownMs(){return Math.max(0,(giftState.lastGift||0)+GIFT_COOLDOWN-Date.now());}
 function msToTime(ms){
@@ -336,7 +427,6 @@ function msToTime(ms){
 }
 function updateGiftButton(){
   const cd=getGiftCooldownMs();
-  giftBtn.disabled=false;
   giftBtn.textContent=cd===0?"Gift (Get Coins!)":"Gift (Not Ready Yet)";
 }
 giftBtn.onclick=function(){
@@ -356,6 +446,7 @@ function showGiftPopup(msg){
 }
 function closeGiftPopup(){giftPopup.style.display="none";giftPopup.onclick=giftPopup.ontouchend=null;document.body.removeEventListener('keydown',giftPopupEscHandler);}
 function giftPopupEscHandler(e){if(e.key==="Escape")closeGiftPopup();}
+
 const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
 const hudHole=document.getElementById('hudHole'),hudStrokes=document.getElementById('hudStrokes'),hudScore=document.getElementById('hudScore');
 const hudPar=document.getElementById('hudPar'),hudCoins=document.getElementById('hudCoins'),clubBtn=document.getElementById('clubBtn');
@@ -365,6 +456,7 @@ let currentCourseIdx=0,holeIdx=0,strokes=0,totalScore=0,currentPar=3,club='drive
 const ball={x:195,y:540,vx:0,vy:0,r:9};
 let dragging=false,dragX=0,dragY=0,aimDX=0,aimDY=0,powerPct=0,prevX=ball.x,prevY=ball.y;
 let obstacles=[],coinsOnHole=[],cup={x:195,y:70,r:12},startPos={x:195,y:540};
+
 clubBtn.onclick=()=>{club=club==='driver'?'putter':'driver';clubBtn.textContent='Club: '+(club==='driver'?'Driver':'Putter');};
 function exitGame(){hide(gameEl);renderMenu();}
 function startCourse(idx){
@@ -378,11 +470,14 @@ function endCourse(){
   const par=COURSE_PAR[currentCourseIdx];
   const resultOK=totalScore<=0;
   if(resultOK&&state.courses[currentCourseIdx+1])state.courses[currentCourseIdx+1].unlocked=true;
-  saveState();show(summaryEl);
+  saveState();
+  renderEarnTab();
+  show(summaryEl);
   summaryBody.innerHTML=`Course: <strong>${course.name}</strong><br>Total Par: <strong>${par}</strong><br>Your total vs par: <strong>${scoreToString(totalScore)}</strong><br>`+
     `${resultOK?'Nice! Next course unlocked.':'Finish E or better to unlock next.'}`;
 }
 function summaryToMenu(){hide(summaryEl);exitGame();}
+
 function setupHoleFromPreset(){
   const p=COURSES[currentCourseIdx][holeIdx];
   startPos={x:p.start.x,y:p.start.y};ball.x=startPos.x;ball.y=startPos.y;ball.vx=0;ball.vy=0;prevX=ball.x;prevY=ball.y;dragging=false;powerPct=0;
@@ -395,6 +490,7 @@ function updateHUD(){
   hudScore.textContent=`Score: ${scoreToString(totalScore)}`;hudPar.textContent=`Par ${currentPar}`;hudCoins.textContent=state.coins;
 }
 function loop(){update();draw();requestAnimationFrame(loop);}
+
 function update(){
   prevX=ball.x;prevY=ball.y;ball.x+=ball.vx;ball.y+=ball.vy;
   ball.vx*=0.985;ball.vy*=0.985;
@@ -430,6 +526,7 @@ function update(){
     }
   }
 }
+
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   if(currentCourseIdx===7){
@@ -441,6 +538,7 @@ function draw(){
   }else{
     for(let i=0;i<8;i++){ctx.fillStyle=`rgba(255,255,255,${0.03*(i%2)})`;ctx.fillRect(0,i*80,canvas.width,40);}
   }
+
   obstacles.forEach(o=>{
     if(o.type==='sand'){
       const g=ctx.createLinearGradient(o.x,o.y,o.x,o.y+o.h);g.addColorStop(0,'#f7e8b6');g.addColorStop(1,'#e0cd8e');
@@ -458,18 +556,39 @@ function draw(){
       ctx.fillStyle=g;roundRect(o.x,o.y,o.w,o.h,10,true,false);
     }
   });
+
   coinsOnHole.forEach(c=>{
     const g=ctx.createRadialGradient(c.x-2,c.y-2,2,c.x,c.y,10);g.addColorStop(0,'#fff8a8');g.addColorStop(1,'#e7b100');
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.stroke();
   });
+
   ctx.beginPath();ctx.arc(cup.x,cup.y,cup.r,0,Math.PI*2);ctx.fillStyle='#0b1110';ctx.fill();
   ctx.beginPath();ctx.arc(cup.x,cup.y,cup.r+4,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=3;ctx.stroke();
   ctx.beginPath();ctx.moveTo(cup.x,cup.y-cup.r-18);ctx.lineTo(cup.x,cup.y);ctx.strokeStyle='#1b1b1b';ctx.lineWidth=3;ctx.stroke();
   ctx.beginPath();ctx.moveTo(cup.x,cup.y-cup.r-18);ctx.lineTo(cup.x+18,cup.y-cup.r-12);ctx.lineTo(cup.x,cup.y-cup.r-6);ctx.closePath();ctx.fillStyle='#ffd34d';ctx.fill();
-  const sel=BALL_STORE.find(b=>b.id===state.selectedBall)||BALL_STORE[0];
-  const bg=ctx.createRadialGradient(ball.x-3,ball.y-3,2,ball.x,ball.y,ball.r);
-  bg.addColorStop(0,'#ffffff');bg.addColorStop(1,sel.color);
-  ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=2;ctx.stroke();
+
+  // RENDER SELECTED BALL (supports solid colors only now — as requested)
+  const selectedBall = [...BALL_STORE, ...EARN_BALLS].find(b => b.id === state.selectedBall) || BALL_STORE[0];
+  const bg = ctx.createRadialGradient(ball.x-3, ball.y-3, 2, ball.x, ball.y, ball.r);
+  bg.addColorStop(0, '#ffffff');
+  bg.addColorStop(1, selectedBall.color);
+
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fillStyle = bg;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,.35)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if (selectedBall.smiley) {
+    ctx.font = '14px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000000';
+    ctx.fillText(':)', ball.x, ball.y);
+  }
+
   if(dragging){
     ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(dragX,dragY);ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.strokeStyle='rgba(255,255,255,.9)';ctx.stroke();ctx.setLineDash([]);
     ctx.font='bold 16px system-ui,-apple-system,Segoe UI';ctx.textAlign='center';ctx.textBaseline='bottom';
@@ -477,11 +596,13 @@ function draw(){
     ctx.fillStyle='#eafff2';ctx.fillText(`${Math.round(powerPct*100)}%`,ball.x,ball.y-20);
   }
 }
+
 function roundRect(x,y,w,h,r,f,s){
   if(w<2*r)r=w/2;if(h<2*r)r=h/2;ctx.beginPath();ctx.moveTo(x+r,y);
   ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
   if(f)ctx.fill();if(s)ctx.stroke();
 }
+
 function getCanvasPoint(x,y){
   const r=canvas.getBoundingClientRect();
   return{x:(x-r.left)*(canvas.width/r.width),y:(y-r.top)*(canvas.height/r.height)};
@@ -499,12 +620,14 @@ function endDrag(){
   ball.vx=-Math.cos(ang)*speed;ball.vy=-Math.sin(ang)*speed;strokes++;updateHUD();
 }
 function calcAim(){aimDX=dragX-ball.x;aimDY=dragY-ball.y;powerPct=Math.min(Math.hypot(aimDX,aimDY),MAX_PULL)/MAX_PULL;}
+
 canvas.addEventListener('touchstart',e=>{const t=e.touches[0];const p=getCanvasPoint(t.clientX,t.clientY);startDrag(p.x,p.y);},{passive:true});
 canvas.addEventListener('touchmove',e=>{const t=e.touches[0];const p=getCanvasPoint(t.clientX,t.clientY);moveDrag(p.x,p.y);},{passive:true});
 canvas.addEventListener('touchend',()=>endDrag());
 canvas.addEventListener('mousedown',e=>{const p=getCanvasPoint(e.clientX,e.clientY);startDrag(p.x,p.y);});
 window.addEventListener('mousemove',e=>{const p=getCanvasPoint(e.clientX,e.clientY);moveDrag(p.x,p.y);});
 window.addEventListener('mouseup',()=>endDrag());
+
 function init(){renderMenu();}
 init();
 </script>
