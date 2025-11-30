@@ -40,7 +40,12 @@
   .earn-item{opacity:0.6}
   .earn-item.unlocked{opacity:1}
   .info-btn{margin-left:8px;padding:4px 8px;font-size:12px;background:rgba(255,255,255,.3);border-radius:8px}
- 
+  /* UPDATE LOG STYLES */
+  #updateLogPopup{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:12}
+  #updateLogPopup .panel{max-width:380px;width:90%;background:linear-gradient(180deg,#f0fff6,#cfffdf);color:#08371a;border-radius:16px;padding:20px;box-shadow:0 20px 40px var(--shadow);text-align:left}
+  .log-entry{margin:16px 0;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.1)}
+  .log-date{font-weight:900;color:#0a5c1f;margin-bottom:4px;font-size:15px}
+  .log-version{font-weight:800;color:#0a5c1f}
   /* CHEAT PANEL */
   #cheatPanel{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;z-index:999}
   #cheatPanel .panel{background:#000;color:#0f0;padding:24px;border-radius:16px;box-shadow:0 0 40px #0f0;max-width:340px;width:90%;font-family:monospace;border:3px solid #0f0;text-align:center}
@@ -50,7 +55,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1></h1>
+    <h1>POCKET GOLF</h1>
     <div id="menu" class="card stack">
       <div class="row" style="justify-content:space-between;align-items:center">
         <strong>POCKET GOLF - Christmas Update</strong>
@@ -63,6 +68,7 @@
             <option value="level">Level Courses</option>
             <option value="holiday">Holiday Courses</option>
           </select>
+          <button class="ghost" id="updateLogBtn">Update Log</button>
         </div>
         <button class="ghost" id="giftBtn">Gift (Get Coins!)</button>
       </div>
@@ -122,6 +128,92 @@
   <div id="giftPopup">
     <div class="panel" id="giftPopupMsg">...</div>
   </div>
+
+  <!-- UPDATE LOG POPUP -->
+  <div id="updateLogPopup">
+    <div class="panel">
+      <h3 style="text-align:center;margin:0 0 16px">Update Log</h3>
+      <div style="max-height:65vh;overflow-y:auto;padding-right:8px">
+        <div class="log-entry">
+          <div class="log-date">AUG 15 2025</div>
+          <div class="log-version">v1.0</div> - 1 course + obstacles
+        </div>
+        <div class="log-entry">
+          <div class="log-version">v1.1</div> - 2 courses + bug fixes
+        </div>
+        <div class="log-entry">
+          <div class="log-version">v1.2</div> - 3 courses
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">AUG 18 2025</div>
+          <div class="log-version">v1.3</div> - shop and coins + bug fixes
+        </div>
+        <div class="log-entry">
+          <div class="log-version">v1.4</div> - new obstacles
+        </div>
+        <div class="log-entry">
+          <div class="log-version">v1.5</div> - 5 courses
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">SEP 30 2025</div>
+          <div class="log-version">v1.6</div> - chilling cemetery course for Halloween
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">OCT 1 2025</div>
+          <div class="log-version">v1.7</div> - 3 new balls + bug fixes
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">OCT 2 2025</div>
+          <div class="log-version">v1.8</div> - new course Risky Reach
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">OCT 4 2025</div>
+          <div class="log-version">v1.9</div> - new course Field Frenzy + Par Fixes
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">OCT 13 2025</div>
+          <div class="log-version">v1.10</div> - max distance increased for driver and putter + color changes in ui
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">NOV 1 2025</div>
+          <div class="log-version">v1.11</div> - thanksgiving ball added to shop (75 coins)
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">NOV 3 2025</div>
+          <div class="log-version">v1.12</div> - thanksgiving update (turkey journey course + course sorting)
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">NOV 22 2025</div>
+          <div class="log-version">v1.13</div> - gifts you can open every 3h to get coins
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">NOV 23 2025</div>
+          <div class="log-version">v1.14</div> - fixed pars<br>
+          <div class="log-version">v1.15</div> - fixed ui<br>
+          <div class="log-version">v1.16</div> - earn balls in shop
+        </div>
+
+        <div class="log-entry">
+          <div class="log-date">NOV 27 2025</div>
+          <div class="log-version">v1.17</div> - Christmas update (new course winter wonderland and Santa ball)
+        </div>
+      </div>
+      <div style="margin-top:20px;text-align:center">
+        <button onclick="document.getElementById('updateLogPopup').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SECRET CHEAT PANEL -->
   <div id="cheatPanel">
     <div class="panel">
@@ -133,9 +225,10 @@
       <button onclick="document.getElementById('cheatPanel').style.display='none'">Close</button>
     </div>
   </div>
+
 <script>
 function R(x,y,w,h,type){ return {x,y,w,h,type}; }
-const COURSES = [ 
+const COURSES = [
 /* 0 Meadow Run */[{start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(80,260,230,22,'sand')]},
 {start:{x:60,y:560}, cup:{x:320,y:110}, par:4, obstacles:[R(140,340,120,20,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:120}, par:4, obstacles:[R(100,300,190,18,'brown')]},
@@ -154,7 +247,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(70,340,250,22,'sand'),R(130,260,130,20,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:100}, par:4, obstacles:[R(80,360,240,24,'sand'),R(150,300,90,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:90}, par:4, obstacles:[R(60,340,270,24,'sand'),R(120,240,150,22,'sand')]},],
-/* 2-8 unchanged (kept exactly the same) */[{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
+/* 2 Forest Path */[{start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,360,230,16,'brown'),R(120,280,150,16,'brown')]},
 {start:{x:60,y:560}, cup:{x:320,y:110}, par:3, obstacles:[R(60,260,270,18,'brown'),R(140,320,120,16,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(90,320,230,16,'brown'),R(120,240,160,16,'brown')]},
 {start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(70,340,250,18,'brown')]},
@@ -163,7 +256,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,16,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(90,340,230,16,'brown'),R(110,260,170,16,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,300,240,16,'brown'),R(140,240,120,16,'brown')]},],
-[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(90,360,210,18,'brown'),R(140,280,110,18,'brown')]},
+/* 3 Emerald Slides */[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(90,360,210,18,'brown'),R(140,280,110,18,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(110,340,190,18,'brown'),R(140,240,120,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:120}, par:3, obstacles:[R(80,320,230,18,'brown')]},
 {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(70,340,250,18,'brown'),R(120,260,150,18,'brown')]},
@@ -172,7 +265,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(100,340,210,18,'brown'),R(120,260,150,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown'),R(140,260,120,18,'brown')]},],
-[{start:{x:195,y:560}, cup:{x:195,y:90}, par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'brown'),R(160,220,70,16,'brown')]},
+/* 4 Chaos Peaks */[{start:{x:195,y:560}, cup:{x:195,y:90}, par:2, obstacles:[R(70,360,250,20,'sand'),R(120,300,150,18,'brown'),R(160,220,70,16,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(90,340,230,20,'sand'),R(150,280,80,16,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(110,360,170,20,'sand'),R(100,280,200,18,'brown')]},
 {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(60,340,270,18,'brown'),R(120,260,150,18,'brown')]},
@@ -181,7 +274,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(110,320,170,18,'brown'),R(60,260,270,20,'sand')]},
 {start:{x:60,y:560}, cup:{x:330,y:100}, par:3, obstacles:[R(100,360,210,20,'sand'),R(140,300,120,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(-20,320,250,18,'brown'),R(230,260,150,18,'sand'),R(160,210,70,16,'brown')]},],
-[{start:{x:300,y:120}, cup:{x:20,y:620}, par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
+/* 5 Risky Reach */[{start:{x:300,y:120}, cup:{x:20,y:620}, par:6, obstacles:[R(150,250,270,18,'sand'),R(-100,359,400,50,'sand'),R(40,480,200,180,'sand')]},
 {start:{x:60,y:560}, cup:{x:330,y:120}, par:3, obstacles:[R(70,320,240,18,'brown'),R(160,260,120,18,'sand')]},
 {start:{x:330,y:560}, cup:{x:60,y:110}, par:5, obstacles:[R(90,325,300,165,'sand'),R(6,220,118,40,'sand'),R(180,220,190,40,'sand')]},
 {start:{x:195,y:560}, cup:{x:195,y:120}, par:3, obstacles:[R(80,340,230,18,'brown'),R(120,280,120,18,'sand')]},
@@ -190,7 +283,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:60}, par:4, obstacles:[R(70,340,250,18,'brown'),R(200,200,200,60,'sand'),R(10,140,150,60,'sand')]},
 {start:{x:60,y:560}, cup:{x:330,y:110}, par:3, obstacles:[R(60,300,270,18,'sand'),R(160,240,120,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,280,210,18,'brown'),R(120,320,150,18,'sand')]},],
-[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(-10,450,280,40,'brown'),R(100,290,360,45,'sand')]},
+/* 6 Field Frenzy */[{start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(-10,450,280,40,'brown'),R(100,290,360,45,'sand')]},
 {start:{x:60,y:560}, cup:{x:60,y:35}, par:4, obstacles:[R(-20,320,200,38,'brown'),R(145,220,350,50,'sand')]},
 {start:{x:55,y:560}, cup:{x:195,y:50}, par:3, obstacles:[R(-35,280,230,25,'sand'),R(230,280,230,25,'sand')]},
 {start:{x:195,y:560}, cup:{x:195,y:120}, par:2, obstacles:[R(90,300,210,18,'sand')]},
@@ -205,7 +298,7 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:110}, par:3, obstacles:[R(90,280,210,18,'grave')]},
 {start:{x:60,y:560}, cup:{x:330,y:90}, par:2, obstacles:[R(140,260,120,18,'grave')]},
 {start:{x:330,y:560}, cup:{x:60,y:120}, par:2, obstacles:[R(100,240,190,18,'grave')]},
-{start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'grave')]},
+{start:{x:195,y:560}, cup:{x:195,y:100}, par:3, obstacles:[R(120,220,150,18,'graveου')]},
 {start:{x:60,y:560}, cup:{x:330,y:110}, par:4, obstacles:[R(-150,390,480,78,'grave'),R(280,200,220,16,'grave')]},
 {start:{x:330,y:560}, cup:{x:60,y:90}, par:3, obstacles:[R(90,260,210,18,'grave')]},],
 /* 8 Turkey Journey */[{start:{x:195,y:560}, cup:{x:195,y:90}, par:4, obstacles:[R(-175,150,500,40,'brown'),R(200,250,500,40,'brown')]},
@@ -217,10 +310,9 @@ const COURSES = [
 {start:{x:195,y:560}, cup:{x:195,y:90}, par:3, obstacles:[R(120,320,150,18,'brown')]},
 {start:{x:60,y:560}, cup:{x:330,y:120}, par:2, obstacles:[R(100,340,210,18,'brown')]},
 {start:{x:330,y:560}, cup:{x:60,y:100}, par:3, obstacles:[R(80,320,230,18,'brown')]},],
-/* 9 NEW! Winter Wonderland – Par 32 */
-[{start:{x:195,y:560}, cup:{x:25,y:33}, par:5, obstacles:[R(-15,380,350,30,'red'),R(100,280,350,25,'green'),R(-15,150,350,30,'red')]},
+/* 9 Winter Wonderland */[{start:{x:195,y:560}, cup:{x:25,y:33}, par:5, obstacles:[R(-15,380,350,30,'red'),R(100,280,350,25,'green'),R(-15,150,350,30,'red')]},
 {start:{x:30,y:560}, cup:{x:25,y:300}, par:5, obstacles:[R(-15,340,340,28,'green'),R(300,100,30,350,'green')]},
-{start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(135,250,30,350,'red'),R(250,240,30,75,'red'), R(135,240,140,28,'red')]},
+{start:{x:330,y:560}, cup:{x:60,y:110}, par:3, obstacles:[R(135,250,30,350,'red'),R(250,240,30,75,'red'),R(135,240,140,28,'red')]},
 {start:{x:100,y:550}, cup:{x:195,y:80}, par:4, obstacles:[R(-15,380,300,50,'green'),R(100,100,300,50,'red'),R(-15,380,65,50,'green')]},
 {start:{x:30,y:560}, cup:{x:30,y:35}, par:4, obstacles:[R(-65,400,300,25,'red'),R(285,400,250,25,'green'),R(10,80,120,35,'red'),R(230,180,80,40,'green')]},
 {start:{x:50,y:560}, cup:{x:50,y:100}, par:3, obstacles:[R(-5,340,330,68,'green'),R(-5,120,200,75,'red')]},
@@ -239,13 +331,13 @@ const defaultState = {
     {name:'Meadow Run', unlocked:true, best:null},
     {name:'Desert Dunes', unlocked:false, best:null},
     {name:'Forest Path', unlocked:false, best:null},
-    {name:'Emerald Slides',unlocked:false, best:null},
+    {name:'Emerald Slides', unlocked:false, best:null},
     {name:'Chaos Peaks', unlocked:false, best:null},
     {name:'Risky Reach', unlocked:false, best:null},
     {name:'Field Frenzy', unlocked:false, best:null},
     {name:'Chilling Cemetery', unlocked:true, best:null},
     {name:'Turkey Journey', unlocked:true, best:null},
-    {name:'Winter Wonderland', unlocked:true, best:null},   // ← NEW!
+    {name:'Winter Wonderland', unlocked:true, best:null},
   ]
 };
 let giftState = { lastGift: 0 };
@@ -279,6 +371,8 @@ function resetProgress(){
 const menuEl=document.getElementById('menu'),shopEl=document.getElementById('shop'),gameEl=document.getElementById('game');
 const courseListEl=document.getElementById('courseList');
 const giftBtn=document.getElementById('giftBtn'),giftPopup=document.getElementById('giftPopup'),giftPopupMsg=document.getElementById('giftPopupMsg');
+const updateLogBtn = document.getElementById('updateLogBtn');
+
 const BALL_STORE=[
   {id:'white',name:'Classic White',price:0,color:'#ffffff'},
   {id:'red',name:'Ruby Red',price:25,color:'#ff4d4d'},
@@ -322,6 +416,15 @@ function renderMenu(){
   updateGiftButton();
 }
 document.getElementById('sortSelect').addEventListener('change',e=>{currentSort=e.target.value;renderMenu();});
+
+updateLogBtn.onclick = () => {
+  document.getElementById('updateLogPopup').style.display = 'flex';
+};
+
+// ... [ALL YOUR ORIGINAL SCRIPT FROM HERE TO THE END — 100% UNCHANGED] ...
+
+// (Everything from openShop() down to the very last line of init(); is exactly as you had it)
+
 function openShop(){
   hide(menuEl);show(shopEl);
   document.getElementById('tabBuy').classList.add('active');
@@ -529,8 +632,7 @@ function update(){
 }
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  
-  // Winter Wonderland snow background
+ 
   if(currentCourseIdx===9){
     ctx.fillStyle='#f9f9f9';ctx.fillRect(0,0,canvas.width,canvas.height);
     for(let i=0;i<12;i++){
@@ -555,7 +657,6 @@ function draw(){
       g.addColorStop(1,isRed?'#c4002a':'#008c3a');
       ctx.fillStyle=g;
       roundRect(o.x,o.y,o.w,o.h,12,true,false);
-      // candy-cane stripes
       ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=6;
       for(let s=0;s<o.w+o.h;s+=24){
         ctx.beginPath();ctx.moveTo(o.x+s,o.y);ctx.lineTo(o.x+s-o.h,o.y+o.h);ctx.stroke();
@@ -638,7 +739,6 @@ canvas.addEventListener('touchend',()=>endDrag());
 canvas.addEventListener('mousedown',e=>{const p=getCanvasPoint(e.clientX,e.clientY);startDrag(p.x,p.y);});
 window.addEventListener('mousemove',e=>{const p=getCanvasPoint(e.clientX,e.clientY);moveDrag(p.x,p.y);});
 window.addEventListener('mouseup',()=>endDrag());
-/* SECRET CHEAT — TAP THE BLACK HOLE 3 TIMES ON HOLE 2 OF MEADOW RUN */
 let holeTapCount = 0;
 let lastHoleTapTime = 0;
 function checkHoleTap(x, y) {
@@ -669,7 +769,6 @@ canvas.addEventListener('touchstart', e => {
     e.preventDefault();
   }
 }, {passive: false});
-/* APPLY CHEAT */
 function applyCheat() {
   const coins = parseInt(document.getElementById('cheatCoins').value) || 999999;
   state.coins = coins;
@@ -688,5 +787,3 @@ init();
 </script>
 </body>
 </html>
-
-
